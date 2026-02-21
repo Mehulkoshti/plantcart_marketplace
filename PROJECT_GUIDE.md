@@ -89,9 +89,14 @@ The project follows a **Premium/Elite design system**:
 
 ---
 
-## 6. How to Run (For Team Members)
-1. **Environment**: Create a virtual environment (`python -m venv venv`).
-2. **Dependencies**: Run `pip install -r requirements.txt`.
-3. **Database**: Run `python manage.py migrate`.
-4. **Admin**: Create a superuser (`python manage.py createsuperuser`).
-5. **Start**: Run `python manage.py runserver`.
+## 6. How to Run & Setup
+For a detailed step-by-step guide on how to set up this project on a **New PC**, please refer to the dedicated guide:
+
+👉 **[NEW_PC_SETUP_GUIDE.md](file:///d:/plant_marketplace/NEW_PC_SETUP_GUIDE.md)**
+
+### Quick Start:
+1. **Environment**: `python -m venv venv`
+2. **Dependencies**: `pip install -r requirements.txt`
+3. **Database**: Create MySQL DB `plant_marketplace_db` and run `python manage.py migrate`.
+4. **Admin**: `python manage.py createsuperuser`.
+5. **Start**: `python manage.py runserver`.
