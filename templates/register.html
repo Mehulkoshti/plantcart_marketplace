@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Join PlantCart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="bg-primary-custom p-4 text-white text-center">
+                <h3 class="mb-0">Create Account</h3>
+                <p class="mb-0 opacity-75">Join our green community today</p>
+            </div>
+            <div class="card-body p-5">
+                <form method="post" id="registrationForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-600">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-600">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-600">Email Address</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-600">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                            <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-600">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                            <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-600 d-block">Register As</label>
+                        <div class="d-flex gap-4 mt-2">
+                            {% for radio in form.role %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label ms-2" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div id="vendorFields" style="display: none;">
+                        <hr class="my-4">
+                        <h5 class="fw-bold mb-3 text-success">Shop Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Shop Name</label>
+                                {{ form.shop_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Business Type</label>
+                                {{ form.business_type }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Shop Address</label>
+                            {{ form.shop_address }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Phone Number</label>
+                                {{ form.phone_number }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Identity Proof (AADHAR/PAN)</label>
+                                {{ form.identity_proof_number }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Years of Experience</label>
+                                {{ form.years_of_experience }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-600">Shop License / GSTIN (Optional)</label>
+                                {{ form.gst_number }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Shop / Business Image</label>
+                            {{ form.shop_image }}
+                            <div class="small text-muted mt-1">Upload a clear photo of your nursery or shop.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-600">Website or Social Media Link (Optional)</label>
+                            {{ form.website_url }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary-custom py-3">Register Now</button>
+                    </div>
+                </form>
+                <div class="text-center mt-4">
+                    <p class="mb-0">Already have an account? <a href="{% url 'accounts:login' %}"
+                            class="text-success fw-600">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const roleRadios = document.querySelectorAll('input[name="role"]');
+        const vendorFields = document.getElementById('vendorFields');
+
+        function toggleVendorFields() {
+            const selectedRole = document.querySelector('input[name="role"]:checked');
+            if (selectedRole && selectedRole.value === 'VENDOR') {
+                vendorFields.style.display = 'block';
+            } else {
+                vendorFields.style.display = 'none';
+            }
+        }
+
+        roleRadios.forEach(radio => {
+            radio.addEventListener('change', toggleVendorFields);
+        });
+
+        // Initial check
+        toggleVendorFields();
+    });
+</script>
+{% endblock %}
+{% endblock %}

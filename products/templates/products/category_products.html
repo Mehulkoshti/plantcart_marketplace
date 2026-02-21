@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - PlantCart{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="fw-bold mb-1">{{ category.name }}</h1>
+    <p class="text-muted">Explore our beautiful collection of {{ category.name|lower }}</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+            <h5 class="fw-bold mb-4">Sub-categories</h5>
+            <ul class="list-unstyled mb-0">
+                {% for sub in category.subcategories.all %}
+                <li class="mb-3">
+                    <a href="#"
+                        class="text-decoration-none text-dark d-flex justify-content-between align-items-center">
+                        <span>{{ sub.name }}</span>
+                        <span class="badge bg-light text-muted rounded-pill">{{ sub.products.count }}</span>
+                    </a>
+                </li>
+                {% empty %}
+                <li class="text-muted small">No sub-categories</li>
+                {% endfor %}
+            </ul>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold mb-4">Price Range</h5>
+            <input type="range" class="form-range" min="0" max="1000" id="priceRange">
+            <div class="d-flex justify-content-between mt-2">
+                <span class="small text-muted">₹0</span>
+                <span class="small text-muted">₹1000</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-12 col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 product-card transition-hover">
+                    <div class="position-relative">
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                            style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'cart:toggle_wishlist' product.id %}"
+                            class="btn btn-white btn-wishlist position-absolute top-0 end-0 m-3 shadow-sm rounded-circle">
+                            {% if product.id in wishlisted_product_ids %}
+                            <i class="fas fa-heart text-danger"></i>
+                            {% else %}
+                            <i class="far fa-heart text-danger"></i>
+                            {% endif %}
+                        </a>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-2">{{ product.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 fw-bold text-success mb-0">₹{{ product.price }}</span>
+                            <a href="{% url 'products:product_detail' product.slug %}"
+                                class="btn btn-outline-success btn-sm rounded-pill px-3">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-leaf fa-3x text-muted mb-3 opacity-25"></i>
+                <p class="text-muted">No products found in this category.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.3s ease;
+    }
+
+    .transition-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-wishlist {
+        width: 35px;
+        height: 35px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: none;
+        z-index: 10;
+    }
+
+    .btn-wishlist:hover {
+        background: var(--soft-cream);
+    }
+</style>
+{% endblock %}

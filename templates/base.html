@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Plant Marketplace{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap CSS for layout utilities -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom Premium CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+        /* Small local overrides or dynamic content styles */
+        .main-content {
+            min-height: 80vh;
+            padding-top: 5.5rem;
+            /* Space for fixed navbar */
+        }
+
+        .nav-item .nav-link {
+            font-weight: 500;
+            color: var(--charcoal) !important;
+            padding: 0.5rem 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-item .nav-link:hover {
+            color: var(--fresh-leaf) !important;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: var(--luxury-shadow);
+            border-radius: 18px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--soft-cream);
+            color: var(--fresh-leaf) !important;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-premium fixed-top" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand text-gradient" href="{% url 'products:home' %}">
+                <i class="fas fa-leaf"></i> PlantCart
+            </a>
+
+            <!-- Icons for Mobile View (Right-aligned, next to toggle) -->
+            <div class="d-flex d-lg-none align-items-center gap-2 ms-auto me-2">
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                        data-bs-toggle="dropdown">
+                        <i class="fas fa-circle-user fs-5 text-success"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
+                        {% if user.role == 'VENDOR' %}
+                        <li><a class="dropdown-item" href="{% url 'products:vendor_dashboard' %}"><i
+                                    class="fas fa-chart-line me-2"></i> Dashboard</a></li>
+                        {% elif user.role == 'ADMIN' %}
+                        <li><a class="dropdown-item" href="/admin/"><i class="fas fa-user-shield me-2"></i> Admin
+                                Panel</a></li>
+                        {% endif %}
+                        {% if user.role == 'CUSTOMER' %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:customer_profile' %}">
+                                <i class="fas fa-user-circle me-2"></i> My Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cart:user_orders' %}">
+                                <i class="fas fa-box-open me-2"></i> My Orders</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:vendor_profile' %}">
+                                <i class="fas fa-user-circle me-2"></i> Profile</a></li>
+                        {% endif %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i
+                                    class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'cart:wishlist_view' %}" class="nav-link position-relative px-2">
+                    <i class="far fa-heart fs-5"></i>
+                    {% if wishlist_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.5rem; padding: 2px 4px;">{{ wishlist_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'cart:cart_view' %}" class="nav-link position-relative px-2">
+                    <i class="fas fa-shopping-bag fs-5"></i>
+                    {% if user.cart_items.count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
+                        style="font-size: 0.5rem; padding: 2px 4px;">{{ user.cart_items.count }}</span>
+                    {% endif %}
+                </a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="nav-link fw-bold small">Login</a>
+                {% endif %}
+            </div>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto ps-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products:home' %}">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCategories" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu border-0" aria-labelledby="navbarDropdownCategories">
+                            <li><a class="dropdown-item fw-bold" href="{% url 'products:all_products' %}">All
+                                    Products</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            {% for category in all_categories %}
+                            <li class="dropdown-submenu dropdown-hover">
+                                <a class="dropdown-item d-flex justify-content-between align-items-center"
+                                    href="{% url 'products:category_products' category.slug %}">
+                                    {{ category.name }} {% if category.subcategories.all %}<i
+                                        class="fas fa-chevron-right small ms-2" style="font-size: 0.6rem;"></i>
+                                    {% endif %}
+                                </a>
+                                {% if category.subcategories.all %}
+                                <ul class="dropdown-menu shadow-sm border-0 rounded-3">
+                                    {% for sub in category.subcategories.all %}
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'products:category_products' category.slug %}?subcategory={{ sub.slug }}">
+                                            {{ sub.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products:about' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products:contact_us' %}">Contact</a></li>
+                </ul>
+
+                <!-- Icons for Desktop View -->
+                <div class="d-none d-lg-flex align-items-center gap-3">
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-circle-user fs-5 text-success"></i>
+                            <span class="d-none d-xl-inline">{{ user.first_name|default:user.email }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
+                            {% if user.role == 'VENDOR' %}
+                            <li><a class="dropdown-item" href="{% url 'products:vendor_dashboard' %}"><i
+                                        class="fas fa-chart-line me-2"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:vendor_profile' %}"><i
+                                        class="fas fa-user-edit me-2"></i> Profile</a></li>
+                            {% elif user.role == 'ADMIN' %}
+                            <li><a class="dropdown-item" href="/admin/"><i class="fas fa-user-shield me-2"></i> Admin
+                                    Panel</a></li>
+                            {% endif %}
+                            {% if user.role == 'CUSTOMER' %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:customer_profile' %}"><i
+                                        class="fas fa-user-circle me-2"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'cart:user_orders' %}"><i
+                                        class="fas fa-box-open me-2"></i> My Orders</a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}"><i
+                                        class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="nav-link fw-bold">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn-premium btn-premium-solid py-2 px-4 shadow-none"
+                        style="font-size: 0.75rem;">Join Now</a>
+                    {% endif %}
+
+                    <a href="{% url 'cart:wishlist_view' %}" class="nav-link position-relative px-2">
+                        <i class="far fa-heart fs-5"></i>
+                        {% if wishlist_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.55rem; padding: 3px 5px;">{{ wishlist_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'cart:cart_view' %}" class="nav-link position-relative px-2">
+                        <i class="fas fa-shopping-bag fs-5"></i>
+                        {% if user.cart_items.count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success"
+                            style="font-size: 0.55rem; padding: 3px 5px;">{{ user.cart_items.count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        {% block main_container %}
+        <div class="container py-5">
+            <div class="container-fluid p-0">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm rounded-4"
+                    role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+
+    <!-- Global Premium Footer -->
+    <footer class="section-padding pb-4" style="background-color: var(--deep-forest); color: white;">
+        <div class="container">
+            <div class="row g-5 mb-5">
+                <div class="col-lg-4">
+                    <a class="footer-logo text-white text-decoration-none mb-4 d-block h3"
+                        href="{% url 'products:home' %}">
+                        <i class="fas fa-leaf text-success me-2"></i> PlantCart
+                    </a>
+                    <p class="opacity-75 mb-4" style="max-width: 320px;">
+                        Bringing nature's serenity to your urban home. We curate the finest local plants and deliver
+                        them with elite care to your doorstep.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#"
+                            class="btn btn-outline-light rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center"
+                            style="width: 36px; height: 36px;"><i class="fab fa-instagram small"></i></a>
+                        <a href="#"
+                            class="btn btn-outline-light rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center"
+                            style="width: 36px; height: 36px;"><i class="fab fa-facebook-f small"></i></a>
+                        <a href="#"
+                            class="btn btn-outline-light rounded-circle shadow-none p-0 d-flex align-items-center justify-content-center"
+                            style="width: 36px; height: 36px;"><i class="fab fa-twitter small"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h5 class="fw-bold mb-4 small text-uppercase tracking-wider">Marketplace</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'products:all_products' %}"
+                                class="text-white text-decoration-none opacity-75 hover-opacity-100">All Plants</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none opacity-75">New Arrivals</a>
+                        </li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none opacity-75">Bestsellers</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h5 class="fw-bold mb-4 small text-uppercase tracking-wider">Company</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'products:about' %}"
+                                class="text-white text-decoration-none opacity-75">About Us</a></li>
+                        <li class="mb-2"><a href="{% url 'products:contact_us' %}"
+                                class="text-white text-decoration-none opacity-75">Contact Us</a></li>
+                        <li class="mb-2"><a href="{% url 'products:become_vendor' %}"
+                                class="text-white text-decoration-none opacity-75">Join as Vendor</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-4 small text-uppercase tracking-wider">Stay Updated</h5>
+                    <p class="opacity-75 small mb-4">Join our community for plant care tips and exclusive offers.</p>
+                    <div class="input-group mb-3 bg-white p-1 rounded-pill overflow-hidden">
+                        <input type="text" class="form-control border-0 bg-transparent text-dark shadow-none px-3 small"
+                            placeholder="Email address">
+                        <button class="btn btn-premium btn-premium-solid py-2 px-3 m-0 shadow-none" type="button"
+                            style="font-size: 0.7rem;">Join</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="opacity-10 my-4">
+            <div class="row align-items-center justify-content-between g-3">
+                <div class="col-md-auto">
+                    <p class="mb-0 opacity-50 small">© 2026 PlantCart Luxury. All rights reserved.</p>
+                </div>
+                <div class="col-md-auto">
+                    <div class="d-flex gap-4 opacity-50 small">
+                        <a href="#" class="text-white text-decoration-none">Privacy Policy</a>
+                        <a href="#" class="text-white text-decoration-none">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function () {
+            const nav = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('navbar-scrolled');
+            } else {
+                nav.classList.remove('navbar-scrolled');
+            }
+        });
+
+        // Simple Intersection Observer for scroll animations
+        document.addEventListener('DOMContentLoaded', function () {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

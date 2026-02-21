@@ -1,0 +1,184 @@
+/* God-Level Premium Style Rules for PlantCart */
+
+:root {
+    --deep-forest: #0F3D2E;
+    --fresh-leaf: #3FA34D;
+    --leaf-gradient: linear-gradient(135deg, #0F3D2E 0%, #3FA34D 100%);
+    --soft-cream: #F8F6F1;
+    --pure-white: #FFFFFF;
+    --charcoal: #1A1A1A;
+    --earthy-brown: #6c584c;
+
+    /* Glassmorphism */
+    --glass-white: rgba(255, 255, 255, 0.75);
+    --glass-dark: rgba(15, 61, 46, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.2);
+
+    /* Shadows & Effects */
+    --luxury-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+    --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    --transition-smooth: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--soft-cream);
+    color: var(--charcoal);
+    line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+.navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* --- God-Level Utility Classes --- */
+
+.text-gradient {
+    background: var(--leaf-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-primary-green {
+    background-color: var(--deep-forest) !important;
+}
+
+.text-primary-green {
+    color: var(--deep-forest) !important;
+}
+
+.bg-light-green {
+    background-color: rgba(63, 163, 77, 0.1) !important;
+}
+
+.glass-card {
+    background: var(--glass-white);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+}
+
+.hover-success {
+    transition: var(--transition-smooth);
+}
+
+.hover-success:hover {
+    color: var(--fresh-leaf) !important;
+}
+
+/* --- Elite Button Styles --- */
+
+.btn-premium {
+    padding: 0.8rem 2.2rem;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: var(--transition-smooth);
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-premium-solid {
+    background: var(--leaf-gradient);
+    color: var(--pure-white) !important;
+    box-shadow: 0 10px 20px rgba(15, 61, 46, 0.2);
+}
+
+.btn-premium-solid:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(15, 61, 46, 0.3);
+}
+
+.btn-premium-outline {
+    background: transparent;
+    border: 2px solid var(--deep-forest);
+    color: var(--deep-forest) !important;
+}
+
+.btn-premium-outline:hover {
+    background: var(--deep-forest);
+    color: var(--pure-white) !important;
+    transform: translateY(-3px);
+}
+
+.btn-premium-ghost {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--pure-white) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-premium-ghost:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+}
+
+.btn-primary-custom {
+    background: var(--leaf-gradient);
+    color: var(--pure-white) !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(63, 163, 77, 0.4);
+    transition: var(--transition-smooth);
+}
+
+.btn-primary-custom:hover {
+    background: linear-gradient(135deg, #3FA34D 0%, #0F3D2E 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(63, 163, 77, 0.5);
+    color: var(--pure-white) !important;
+}
+
+/* --- Navigation & Header --- */
+
+.navbar-premium {
+    background: var(--glass-white);
+    backdrop-filter: blur(15px);
+    transition: var(--transition-smooth);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    top: 0 !important;
+}
+
+.navbar-scrolled {
+    padding: 0.6rem 0;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: var(--soft-shadow);
+}
+
+/* --- Animations --- */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Section Spacing --- */
+
+.section-padding {
+    padding: 100px 0;
+}
+
+@media (max-width: 768px) {
+    .section-padding {
+        padding: 60px 0;
+    }
+}

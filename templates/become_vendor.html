@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Become a Vendor - PlantCart{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .vendor-hero {
+        position: relative;
+        height: 70vh;
+        min-height: 500px;
+        background: linear-gradient(rgba(15, 61, 46, 0.6), rgba(15, 61, 46, 0.4)),
+            url('https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover;
+        border-radius: 0 0 60px 60px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        color: white;
+        margin-bottom: 3rem;
+    }
+
+    .glass-badge {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 8px 24px;
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    /* Benefits Section */
+    .benefit-card {
+        padding: 40px;
+        border-radius: 30px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        height: 100%;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: transparent;
+    }
+
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        background: var(--leaf-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        color: white;
+        box-shadow: 0 10px 20px rgba(15, 61, 46, 0.15);
+    }
+
+    /* Steps Section */
+    .step-card {
+        text-align: center;
+        position: relative;
+        padding: 20px;
+    }
+
+    .step-number {
+        font-size: 5rem;
+        font-weight: 800;
+        color: var(--fresh-leaf);
+        opacity: 0.1;
+        line-height: 1;
+        margin-bottom: -30px;
+        position: relative;
+        z-index: 0;
+    }
+
+    .step-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* FAQ Accordion Customization */
+    .accordion-item {
+        border: none;
+        background: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .accordion-button {
+        background: white;
+        border-radius: 20px !important;
+        padding: 25px;
+        font-weight: 600;
+        box-shadow: var(--soft-shadow);
+        border: none;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: var(--fresh-leaf);
+        color: white;
+        box-shadow: 0 10px 20px rgba(15, 61, 46, 0.2);
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+
+    .accordion-body {
+        background: white;
+        border-radius: 0 0 20px 20px;
+        padding: 25px;
+        margin-top: -10px;
+        padding-top: 30px;
+        box-shadow: var(--soft-shadow);
+    }
+
+    /* CTA Section */
+    .cta-container {
+        border-radius: 40px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .cta-bg {
+        background: var(--leaf-gradient);
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+
+    .cta-pattern {
+        position: absolute;
+        inset: 0;
+        opacity: 0.05;
+        background-image: radial-gradient(#ffffff 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<header class="vendor-hero">
+    <div class="container text-center reveal">
+        <div class="glass-badge">Partner Program</div>
+        <h1 class="display-2 fw-bold mb-4">Turn Your Passion Into <br><span class="text-success-light">Thriving
+                Business</span></h1>
+        <p class="lead mb-5 opacity-90 mx-auto" style="max-width: 700px;">
+            Join the most exclusive community of plant artisans and independent nurseries.
+            Reach thousands of dedicated plant lovers instantly.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:register' %}?role=VENDOR"
+                class="btn btn-lg btn-success rounded-pill px-5 py-3 fw-bold shadow-lg">Start Selling Today</a>
+            <a href="#how-it-works" class="btn btn-lg btn-outline-light rounded-pill px-5 py-3 fw-bold">How it Works</a>
+        </div>
+    </div>
+</header>
+
+<!-- Stats Section -->
+<section class="container mb-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3">
+            <div class="text-center p-4 bg-white rounded-4 shadow-sm reveal" style="transition-delay: 0.1s;">
+                <h2 class="display-4 fw-bold text-success mb-1">500+</h2>
+                <p class="text-muted mb-0 small text-uppercase fw-bold ls-1">Active Vendors</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-4 bg-white rounded-4 shadow-sm reveal" style="transition-delay: 0.2s;">
+                <h2 class="display-4 fw-bold text-success mb-1">50k+</h2>
+                <p class="text-muted mb-0 small text-uppercase fw-bold ls-1">Monthly Visitors</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-4 bg-white rounded-4 shadow-sm reveal" style="transition-delay: 0.3s;">
+                <h2 class="display-4 fw-bold text-success mb-1">0%</h2>
+                <p class="text-muted mb-0 small text-uppercase fw-bold ls-1">Listing Fees</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="h1 fw-bold mb-3">Why Partner With PlantCart?</h2>
+            <p class="text-muted mx-auto" style="max-width: 500px;">We provide the tools, audience, and support you need
+                to grow your green business.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="benefit-card reveal" style="transition-delay: 0.1s;">
+                    <div class="icon-box">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Dedicated Storefront</h4>
+                    <p class="text-muted mb-0">Get your own branded profile page to showcase your collection, tell your
+                        story, and build your customer base.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-card reveal" style="transition-delay: 0.2s;">
+                    <div class="icon-box">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Powerful Analytics</h4>
+                    <p class="text-muted mb-0">Track your sales, view customer insights, and manage inventory with our
+                        intuitive vendor dashboard.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-card reveal" style="transition-delay: 0.3s;">
+                    <div class="icon-box">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Seamless Logistics</h4>
+                    <p class="text-muted mb-0">We handle the delivery logistics so you can focus on what you do best -
+                        growing beautiful plants.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works" class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="h1 fw-bold mb-3">Simple Steps to Success</h2>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-md-4">
+                <div class="step-card reveal" style="transition-delay: 0.1s;">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <h4 class="fw-bold mb-3">Register Account</h4>
+                        <p class="text-muted">Fill out our simple vendor application form with your business details and
+                            identity proof.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card reveal" style="transition-delay: 0.2s;">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <h4 class="fw-bold mb-3">List Products</h4>
+                        <p class="text-muted">Upload high-quality photos and descriptions of your plants. Set your
+                            prices and stock.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card reveal" style="transition-delay: 0.3s;">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <h4 class="fw-bold mb-3">Start Earning</h4>
+                        <p class="text-muted">Receive orders, pack your plants, and get paid directly to your bank
+                            account weekly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section-padding container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="h1 fw-bold mb-5 text-center reveal">Frequently Asked Questions</h2>
+            <div class="accordion" id="vendorFAQ">
+                <div class="accordion-item reveal" style="transition-delay: 0.1s;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq1">
+                            Is there a fee to join?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#vendorFAQ">
+                        <div class="accordion-body">
+                            No, joining PlantCart is completely free! We only charge a small commission fee on
+                            successful sales to cover payment processing and platform maintenance.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item reveal" style="transition-delay: 0.2s;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq2">
+                            How do I get paid?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#vendorFAQ">
+                        <div class="accordion-body">
+                            Payments are processed weekly. Your earnings are transferred directly to the bank account
+                            you provide during registration or in your profile settings.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item reveal" style="transition-delay: 0.3s;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#faq3">
+                            Do I need a business license?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#vendorFAQ">
+                        <div class="accordion-body">
+                            While a business license is recommended, individual growers can also sell on our platform.
+                            You will need to provide a valid government ID (AADHAR/PAN) for verification.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Ribbon -->
+<section class="container pb-5">
+    <div class="cta-container p-5 text-center text-white reveal">
+        <div class="cta-bg"></div>
+        <div class="cta-pattern"></div>
+        <div class="position-relative z-2">
+            <h2 class="display-5 fw-bold mb-4">Ready to Grow Your Business?</h2>
+            <p class="lead opacity-90 mb-5 mx-auto" style="max-width: 600px;">Join thousands of successful vendors today
+                and start selling to plant lovers nationwide.</p>
+            <a href="{% url 'accounts:register' %}?role=VENDOR"
+                class="btn btn-light btn-lg rounded-pill px-5 py-3 fw-bold text-success shadow-lg">Become a Vendor
+                Now</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

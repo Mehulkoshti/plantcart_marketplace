@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}PlantCart - Premium Nature Marketplace{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Section Specific Styles */
+    .hero-luxury {
+        height: 80vh;
+        min-height: 600px;
+        background: linear-gradient(rgba(15, 61, 46, 0.4), rgba(15, 61, 46, 0.4)),
+        url("{% static 'images/hero_bg.png' %}") center/cover;
+        border-radius: 40px;
+        margin: 20px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        color: white;
+    }
+
+    .hero-badge {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 8px 20px;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .category-card {
+        position: relative;
+        height: 350px;
+        border-radius: 30px;
+        overflow: hidden;
+        transition: var(--transition-smooth);
+        cursor: pointer;
+    }
+
+    .category-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition-smooth);
+    }
+
+    .category-card:hover img {
+        transform: scale(1.1);
+    }
+
+    .category-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(15, 61, 46, 0.9), transparent);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 30px;
+        color: white;
+    }
+
+    .product-card-elite {
+        background: white;
+        border-radius: 28px;
+        padding: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        transition: var(--transition-smooth);
+        height: 100%;
+    }
+
+    .product-card-elite:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--luxury-shadow);
+    }
+
+    .product-img-wrapper {
+        position: relative;
+        height: 250px;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .product-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .wishlist-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--charcoal);
+        box-shadow: var(--soft-shadow);
+        transition: var(--transition-smooth);
+        z-index: 10;
+    }
+
+    .wishlist-btn:hover {
+        transform: scale(1.1);
+        color: #ff4757;
+    }
+
+    .testimonial-card {
+        background: white;
+        padding: 40px;
+        border-radius: 32px;
+        box-shadow: var(--soft-shadow);
+        height: 100%;
+    }
+
+    .quote-icon {
+        font-size: 2rem;
+        color: var(--fresh-leaf);
+        opacity: 0.2;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block main_container %}
+<div class="messages-container container-fluid p-0">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm rounded-4 m-3"
+        role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section class="hero-luxury reveal">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="ps-md-4">
+                    <div class="d-flex gap-2 mb-4">
+                        <span class="hero-badge">Exotic Collection</span>
+                        <span class="hero-badge">Free Delivery over ₹999</span>
+                    </div>
+                    <h1 class="display-3 fw-bold mb-4" style="line-height: 1.1;">Transform Your <br> Space Into a <span
+                            class="text-success">Living Sanctuary</span></h1>
+                    <p class="lead mb-5 opacity-90" style="max-width: 550px;">Handpicked houseplants from premium local
+                        nurseries. Delivered with the sophistication you deserve.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="{% url 'products:all_products' %}"
+                            class="btn-premium btn-premium-solid px-5 py-3">Explore Collection</a>
+                        <a href="{% url 'accounts:become_vendor' %}"
+                            class="btn-premium btn-premium-ghost px-4 py-3">Become a Vendor</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Minimal Trust Indicators -->
+<div class="container py-5">
+    <div class="row g-4 justify-content-center">
+        <div class="col-6 col-md-3">
+            <div class="text-center reveal" style="transition-delay: 0.1s;">
+                <div class="text-success h3 mb-3"><i class="fas fa-truck-fast"></i></div>
+                <h6 class="fw-bold mb-1">Elite Delivery</h6>
+                <p class="small text-muted mb-0">City-wide careful shipping</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center reveal" style="transition-delay: 0.2s;">
+                <div class="text-success h3 mb-3"><i class="fas fa-leaf"></i></div>
+                <h6 class="fw-bold mb-1">Certified Fresh</h6>
+                <p class="small text-muted mb-0">Direct from nursery beds</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center reveal" style="transition-delay: 0.3s;">
+                <div class="text-success h3 mb-3"><i class="fas fa-headphones-simple"></i></div>
+                <h6 class="fw-bold mb-1">Plant Concierge</h6>
+                <p class="small text-muted mb-0">Expert care support 24/7</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-center reveal" style="transition-delay: 0.4s;">
+                <div class="text-success h3 mb-3"><i class="fas fa-shield-halved"></i></div>
+                <h6 class="fw-bold mb-1">Secure Checkout</h6>
+                <p class="small text-muted mb-0">Encrypted transactions</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Categories Redesign (Modern Grid) -->
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="h1 fw-bold mb-3">Shop by Category</h2>
+            <p class="text-muted small text-uppercase tracking-widest">Hand-picked collection for every corner</p>
+        </div>
+
+        <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5">
+            {% for category in categories|slice:":6" %}
+            <a href="{% url 'products:category_products' category.slug %}"
+                class="text-decoration-none text-center category-item reveal"
+                style="transition-delay: {{ forloop.counter0 }}00ms;">
+                <div class="category-img-wrapper mb-3 mx-auto shadow-sm">
+                    {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                    {% else %}
+                    <div
+                        class="w-100 h-100 bg-success-subtle d-flex align-items-center justify-content-center rounded-circle">
+                        <i class="fas fa-seedling text-success h2 mb-0"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <h6 class="fw-bold mb-1 text-dark">{{ category.name }}</h6>
+                <span class="small text-muted">{{ category.products.count }} Items</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Inline styles for the new category grid */
+    .category-item {
+        width: 140px;
+        transition: transform 0.3s ease;
+    }
+
+    .category-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .category-img-wrapper {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid white;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .category-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .category-item:hover .category-img-wrapper {
+        box-shadow: 0 10px 20px rgba(15, 61, 46, 0.15) !important;
+        border-color: var(--fresh-leaf);
+    }
+
+    .category-item:hover .category-img-wrapper img {
+        transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+        .category-item {
+            width: 100px;
+        }
+
+        .category-img-wrapper {
+            width: 90px;
+            height: 90px;
+        }
+    }
+</style>
+
+<!-- 4. Featured Products (Elite Cards) -->
+<section class="section-padding bg-white" style="border-radius: 60px 60px 0 0;">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 reveal">
+            <div class="mb-4 mb-md-0 text-center text-md-start">
+                <h2 class="h1 fw-bold mb-2">Our Best Sellers</h2>
+                <p class="text-muted mb-0">Explore our most loved green companions.</p>
+            </div>
+            <a href="{% url 'products:all_products' %}" class="btn-premium btn-premium-outline">View All Products</a>
+        </div>
+
+        <div class="row g-4">
+            {% for product in products|slice:":4" %}
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="product-card-elite reveal" style="transition-delay: {{ forloop.counter0 }}00ms;">
+                    <div class="product-img-wrapper">
+                        <a href="{% url 'cart:toggle_wishlist' product.id %}" class="wishlist-btn text-decoration-none">
+                            {% if product.id in wishlisted_product_ids %}
+                            <i class="fas fa-heart text-danger"></i>
+                            {% else %}
+                            <i class="far fa-heart"></i>
+                            {% endif %}
+                        </a>
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted">
+                            <i class="fas fa-image h1 opacity-25"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        <p class="small text-muted text-uppercase tracking-wider mb-1" style="font-size: 0.65rem;">
+                            {{ product.category.name }}</p>
+                        <h5 class="fw-bold mb-3 h6 text-truncate">{{ product.name }}</h5>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="h6 fw-bold mb-0 text-success">₹{{ product.price }}</span>
+                            <a href="{% url 'products:product_detail' product.slug %}"
+                                class="btn btn-outline-success btn-sm rounded-pill px-3 py-1"
+                                style="font-size: 0.7rem;">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 5. Testimonials (Premium Look) -->
+<section class="section-padding" style="background: #fdfcf9;">
+    <div class="container">
+        <div class="text-center mb-5 reveal">
+            <h2 class="h1 fw-bold mb-3">What Our Community Says</h2>
+            <p class="text-muted small text-uppercase tracking-widest">Real stories from real plant lovers</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card reveal" style="transition-delay: 0.1s;">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p class="mb-4 text-muted italic">"The quality of the Monstera is beyond words. Truly a premium
+                        experience from doorstep to living room."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://i.pravatar.cc/150?u=1" class="rounded-pill" width="50" height="50">
+                        <div>
+                            <h6 class="fw-bold mb-0">Priya Sharma</h6>
+                            <span class="small text-muted">Ariel Interiorist</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card reveal" style="transition-delay: 0.2s;">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p class="mb-4 text-muted italic">"Exceptional service. The post-purchase care guide is professional
+                        and helped my Fiddle Leaf thrive."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://i.pravatar.cc/150?u=2" class="rounded-pill" width="50" height="50">
+                        <div>
+                            <h6 class="fw-bold mb-0">Rahul Verma</h6>
+                            <span class="small text-muted">Architect</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card reveal" style="transition-delay: 0.3s;">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p class="mb-4 text-muted italic">"Direct local sourcing makes all the difference. Vitality of
+                        plants is unparalleled in this marketplace."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://i.pravatar.cc/150?u=3" class="rounded-pill" width="50" height="50">
+                        <div>
+                            <h6 class="fw-bold mb-0">Ananya Das</h6>
+                            <span class="small text-muted">Botanist</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Grower's CTA -->
+<section class="section-padding container">
+    <div class="glass-card p-5 text-center reveal" style="background: var(--leaf-gradient); border: none;">
+        <div class="py-4">
+            <h2 class="display-5 text-white fw-bold mb-3">Grow With PlantCart</h2>
+            <p class="text-white opacity-75 mb-5 mx-auto" style="max-width: 600px;">Join our exclusive network of
+                verified nurseries and reach thousands of passionate plant collectors across the city.</p>
+            <a href="{% url 'accounts:register' %}?role=VENDOR" class="btn-premium btn-premium-ghost px-5 py-3">Start
+                Selling Now</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% endblock %}

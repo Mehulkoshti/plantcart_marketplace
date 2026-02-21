@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - PlantCart{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <h1 class="fw-bold mb-1">Checkout</h1>
+    <p class="text-muted">Complete your botanical purchase</p>
+</div>
+
+<div class="row g-5">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+            <h4 class="fw-bold mb-4">Shipping Information</h4>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label fw-600">Full Delivery Address</label>
+                    <textarea name="address" class="form-control" rows="4"
+                        placeholder="House no, Street, Landmark, City, State, PIN" required></textarea>
+                </div>
+
+                <h4 class="fw-bold mb-4 mt-5">Payment Details</h4>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Payment Method</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="online"
+                                value="online" checked onchange="togglePaymentGroups()">
+                            <label class="form-check-label" for="online">Online Payment (Card/UPI)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod"
+                                onchange="togglePaymentGroups()">
+                            <label class="form-check-label" for="cod">Cash on Delivery</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stripe Elements Placeholder -->
+                <div id="stripe-payment-section" class="mb-4">
+                    <div id="payment-element">
+                        <!-- Stripe.js injects the Payment Element here -->
+                    </div>
+                    <div id="payment-message" class="hidden text-danger small mt-2"></div>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" id="submit-button" class="btn btn-primary-custom py-3 fw-bold">
+                        <span id="button-text">Pay Now</span>
+                        <div class="spinner-border spinner-border-sm ms-2" id="spinner" role="status"
+                            style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-4">Review Your Items</h5>
+            {% for item in cart_items %}
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" class="rounded-3"
+                    style="width: 50px; height: 50px; object-fit: cover;">
+                {% endif %}
+                <div class="flex-grow-1">
+                    <p class="fw-bold mb-0 small">{{ item.product.name }}</p>
+                    <p class="text-muted mb-0 smallest" style="font-size: 0.8rem;">Qty: {{ item.quantity }}</p>
+                </div>
+                <span class="fw-bold small">₹{{ item.total_price }}</span>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-4">
+                <span class="text-muted">Order Total</span>
+                <span class="h4 fw-bold text-success">₹{{ total }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+    const clientSecret = '{{ client_secret }}';
+    let elements;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (clientSecret) {
+            elements = stripe.elements({ clientSecret });
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+        }
+        togglePaymentGroups();
+    });
+
+    function togglePaymentGroups() {
+        const isOnline = document.getElementById('online').checked;
+        const stripeSection = document.getElementById('stripe-payment-section');
+        const submitBtnText = document.getElementById('button-text');
+
+        if (isOnline) {
+            stripeSection.style.display = 'block';
+            submitBtnText.textContent = 'Pay Now';
+        } else {
+            stripeSection.style.display = 'none';
+            submitBtnText.textContent = 'Place Order';
+        }
+    }
+
+    const form = document.querySelector('form');
+    const submitButton = document.getElementById('submit-button');
+    const spinner = document.getElementById('spinner');
+    const buttonText = document.getElementById('button-text');
+    const messageContainer = document.getElementById('payment-message');
+
+    form.addEventListener('submit', async (e) => {
+        const isOnline = document.getElementById('online').checked;
+        if (!isOnline) {
+            // Allow normal form submission for COD
+            return;
+        }
+
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            // 1. Create Order first via AJAX
+            const formData = new FormData(form);
+            // Append a flag to indicate this is an AJAX order creation request
+            formData.append('create_order_only', 'true');
+
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to create order');
+            }
+
+            // 2. Confirm Payment with Stripe
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: window.location.origin + "{% url 'cart:payment_success' %}?address=" + encodeURIComponent(document.querySelector('[name=address]').value),
+                },
+            });
+
+            if (error) {
+                showMessage(error.message);
+                setLoading(false);
+            } else {
+                // Stripe will redirect to return_url
+            }
+
+        } catch (error) {
+            showMessage(error.message);
+            setLoading(false);
+        }
+    });
+
+    function setLoading(isLoading) {
+        if (isLoading) {
+            submitButton.disabled = true;
+            spinner.style.display = 'inline-block';
+            buttonText.textContent = 'Processing...';
+        } else {
+            submitButton.disabled = false;
+            spinner.style.display = 'none';
+            buttonText.textContent = 'Pay Now';
+        }
+    }
+
+    function showMessage(messageText) {
+        messageContainer.classList.remove('hidden');
+        messageContainer.textContent = messageText;
+    }
+</script>
+{% endblock %}

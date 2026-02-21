@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Login - PlantCart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="bg-primary-custom p-4 text-white text-center">
+                <h3 class="mb-0">Welcome Back</h3>
+                <p class="mb-0 opacity-75">Login to access your plants</p>
+            </div>
+            <div class="card-body p-5">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-600">Email Address</label>
+                        <input type="email" name="username" class="form-control py-2" placeholder="name@example.com"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label fw-600">Password</label>
+                            <a href="#" class="text-success small text-decoration-none">Forgot password?</a>
+                        </div>
+                        <input type="password" name="password" class="form-control py-2" placeholder="••••••••"
+                            required>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger py-2 small">
+                        Invalid email or password. Please try again.
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary-custom py-3">Login</button>
+                    </div>
+                </form>
+                <div class="text-center mt-4">
+                    <p class="mb-0">Don't have an account? <a href="{% url 'accounts:register' %}"
+                            class="text-success fw-600">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

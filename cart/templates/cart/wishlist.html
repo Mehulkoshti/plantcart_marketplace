@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}My Wishlist - PlantCart{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="mb-5">
+        <h1 class="fw-bold text-primary-green">My Wishlist</h1>
+        <p class="text-muted">Plants you've liked and want to bring home.</p>
+    </div>
+
+    <div class="row g-4">
+        {% for item in wishlist_items %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 product-card transition-hover">
+                <div class="position-relative">
+                    {% if item.product.image %}
+                    <a href="{% url 'products:product_detail' item.product.slug %}">
+                        <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}"
+                            style="height: 250px; object-fit: cover;">
+                    </a>
+                    {% else %}
+                    <a href="{% url 'products:product_detail' item.product.slug %}">
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="fas fa-image text-muted fa-3x"></i>
+                        </div>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'cart:toggle_wishlist' item.product.id %}"
+                        class="btn btn-white btn-wishlist position-absolute top-0 end-0 m-3 shadow-sm rounded-circle">
+                        <i class="fas fa-heart text-danger"></i>
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-1">{{ item.product.category.name }}</p>
+                    <a href="{% url 'products:product_detail' item.product.slug %}"
+                        class="text-decoration-none text-dark">
+                        <h5 class="fw-bold mb-2">{{ item.product.name }}</h5>
+                    </a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 fw-bold text-success mb-0">₹{{ item.product.price }}</span>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'products:product_detail' item.product.slug %}"
+                                class="btn btn-outline-success btn-sm rounded-pill px-3">View</a>
+                            <a href="{% url 'cart:add_to_cart' item.product.id %}"
+                                class="btn btn-primary-custom btn-sm rounded-pill px-3">
+                                <i class="fas fa-cart-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-4">
+                <i class="far fa-heart fa-4x text-muted opacity-50"></i>
+            </div>
+            <h3>Your wishlist is empty</h3>
+            <p class="text-muted">Start liking plants to see them here!</p>
+            <a href="{% url 'products:all_products' %}"
+                class="btn btn-primary-custom px-5 py-3 rounded-pill fw-bold mt-3">
+                Explore Plants
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .transition-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-wishlist {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: none;
+    }
+
+    .product-card .card-img-top {
+        transition: transform 0.6s ease;
+    }
+
+    .product-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}

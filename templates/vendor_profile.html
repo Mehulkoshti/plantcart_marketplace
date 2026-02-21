@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Vendor Profile - PlantCart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <!-- Sidebar info -->
+                    <div class="col-md-4 bg-primary bg-opacity-10 p-5 text-center">
+                        {% if user.shop_image %}
+                        <img src="{{ user.shop_image.url }}" class="img-fluid rounded-4 shadow-sm mb-4" alt="Shop Image"
+                            style="max-height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-white rounded-4 shadow-sm mb-4 d-flex align-items-center justify-content-center mx-auto"
+                            style="width: 200px; height: 200px;">
+                            <i class="fas fa-store text-primary fa-4x"></i>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold mb-1">{{ user.shop_name|default:"Your Shop" }}</h3>
+                        <p class="text-muted mb-4">{{ user.full_name }}</p>
+
+                        <div class="text-start mt-5">
+                            <p class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> {{ user.email }}</p>
+                            <p class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> {{
+                                user.phone_number|default:"No phone set" }}</p>
+                            <p class="mb-0"><i class="fas fa-calendar-check me-2 text-primary"></i> Member since {{
+                                user.date_joined|date:"M Y" }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="col-md-8 p-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold mb-0">Edit Vendor Profile</h2>
+                            <span
+                                class="badge {% if user.is_approved %}bg-success{% else %}bg-warning{% endif %} rounded-pill px-3">
+                                {% if user.is_approved %}Verified Vendor{% else %}Pending Approval{% endif %}
+                            </span>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">Basic Information</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">First Name</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Last Name</label>
+                                    {{ form.last_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Shop Name</label>
+                                    {{ form.shop_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Phone Number</label>
+                                    {{ form.phone_number }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Shop Address</label>
+                                    {{ form.shop_address }}
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">Business Details</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Business Type</label>
+                                    {{ form.business_type }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Website URL</label>
+                                    {{ form.website_url }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">GST Number</label>
+                                    {{ form.gst_number }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Shop License</label>
+                                    {{ form.shop_license }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">Exp. (Years)</label>
+                                    {{ form.years_of_experience }}
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold">Identity Proof (AADHAR/PAN)</label>
+                                    {{ form.identity_proof_number }}
+                                </div>
+                            </div>
+
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">Shop Presentation</h5>
+                            <div class="mb-5">
+                                <label class="form-label small fw-bold">Shop Display Image</label>
+                                {{ form.shop_image }}
+                                {% if user.shop_image %}
+                                <div class="mt-2 small text-muted">Currently: <a href="{{ user.shop_image.url }}"
+                                        target="_blank">{{ user.shop_image.name }}</a></div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'products:vendor_dashboard' %}" class="btn btn-light px-4">Cancel</a>
+                                <button type="submit" class="btn btn-primary-custom px-5">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

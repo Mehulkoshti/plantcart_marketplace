@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - PlantCart{% endblock %}
+
+{% block content %}
+<div class="row g-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}">
+            {% else %}
+            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                <i class="fas fa-image text-muted fa-4x"></i>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'products:home' %}" class="text-success">Shop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:category_products' product.category.slug %}"
+                        class="text-success">{{ product.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+
+        <h1 class="display-5 fw-bold mb-3">{{ product.name }}</h1>
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="h2 fw-bold text-success mb-0">₹{{ product.price }}</span>
+            {% if product.stock > 0 %}
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">In Stock</span>
+            {% else %}
+            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <p class="text-muted lead mb-5">{{ product.description }}</p>
+
+        <div class="row g-3 mb-5">
+            <div class="col-md-4">
+                <div class="bg-white p-3 rounded-4 shadow-sm text-center">
+                    <i class="fas fa-sun text-warning mb-2"></i>
+                    <p class="small fw-bold mb-0">Sunlight</p>
+                    <p class="small text-muted mb-0">{{ product.sunlight }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-white p-3 rounded-4 shadow-sm text-center">
+                    <i class="fas fa-tint text-primary mb-2"></i>
+                    <p class="small fw-bold mb-0">Watering</p>
+                    <p class="small text-muted mb-0">{{ product.watering }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-white p-3 rounded-4 shadow-sm text-center">
+                    <i
+                        class="fas fa-paw {% if product.pet_safe %}text-success{% else %}text-danger{% endif %} mb-2"></i>
+                    <p class="small fw-bold mb-0">Pet-Safe</p>
+                    <p class="small text-muted mb-0">{% if product.pet_safe %}Yes{% else %}No{% endif %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3">
+            {% if product.stock > 0 %}
+            <a href="{% url 'cart:add_to_cart' product.id %}"
+                class="btn btn-primary-custom btn-lg flex-grow-1 py-3 fw-bold">
+                <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+            </a>
+            {% else %}
+            <button class="btn btn-secondary btn-lg flex-grow-1 py-3 fw-bold" disabled>
+                <i class="fas fa-ban me-2"></i> Out of Stock
+            </button>
+            {% endif %}
+            <a href="{% url 'cart:toggle_wishlist' product.id %}"
+                class="btn btn-outline-danger btn-lg px-4 d-flex align-items-center justify-content-center">
+                {% if product.id in wishlisted_product_ids %}
+                <i class="fas fa-heart"></i>
+                {% else %}
+                <i class="far fa-heart"></i>
+                {% endif %}
+            </a>
+        </div>
+
+        <div class="mt-5 pt-4 border-top">
+            <h5 class="fw-bold mb-3">Plant Details</h5>
+            <div class="row g-2 small text-muted">
+                <div class="col-6"><strong>Scientific Name:</strong>
+                    {{ product.scientific_name|default:"Not available" }}</div>
+                <div class="col-6"><strong>Care Level:</strong> {{ product.care_level }}</div>
+                <div class="col-6"><strong>Growth Rate:</strong> {{ product.growth_rate }}</div>
+                <div class="col-6"><strong>Ideal Location:</strong>
+                    {{ product.ideal_location|default:"Indoor/Outdoor" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h4 class="fw-bold mb-4 text-success"><i class="fas fa-leaf me-2"></i> How to Care for Your
+                {{ product.name }}</h4>
+            <div class="maintenance-tips text-muted mb-0">
+                {{ product.maintenance_tips|linebreaks|default:"Place in indirect sunlight and water when the top inch
+                of soil feels dry." }}
+            </div>
+        </div>
+
+        {% if product.benefits %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary bg-opacity-10">
+            <h4 class="fw-bold mb-3 text-primary"><i class="fas fa-sparkles me-2"></i> Key Benefits</h4>
+            <p class="mb-0 text-muted">{{ product.benefits }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+            <h5 class="fw-bold mb-4">Sold by Vendor</h5>
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-light-green rounded-circle d-flex align-items-center justify-content-center"
+                    style="width: 50px; height: 50px;">
+                    <i class="fas fa-user-tie text-success"></i>
+                </div>
+                <div>
+                    <p class="mb-0 fw-bold">{{ product.vendor.full_name }}</p>
+                    <p class="mb-0 text-muted small">Verified Shop</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="small text-muted">
+                <p class="mb-1"><i class="fas fa-store me-2"></i> {{ product.vendor.shop_name }}</p>
+                <p class="mb-0"><i class="fas fa-phone me-2"></i> {{ product.vendor.phone_number }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

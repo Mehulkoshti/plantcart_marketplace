@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Plant{% else %}Add New Plant{% endif %} - PlantCart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <h2 class="fw-bold mb-1">{% if form.instance.pk %}Edit {{ form.instance.name }}{% else %}List Your
+                        Plant{% endif %}</h2>
+                    <p class="text-muted">{% if form.instance.pk %}Update your plant details below.{% else %}Fill in the
+                        details to reach more customers.{% endif %}</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" id="productForm">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-600">Sub-Category</label>
+                            <small class="text-muted d-block mb-1">Category will be automatically assigned based on your
+                                selection.</small>
+                            {{ form.subcategory }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-600">Plant Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-600">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Price (₹)</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Stock Available</label>
+                            {{ form.stock }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Environment</label>
+                            {{ form.environment }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Plant Image</label>
+                            {{ form.image }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Scientific Name</label>
+                            {{ form.scientific_name }}
+                        </div>
+
+                        <hr class="my-4">
+                        <h5 class="fw-bold mb-3 text-success">Advanced Plant Details</h5>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-600">Care Level</label>
+                            {{ form.care_level }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-600">Sunlight</label>
+                            {{ form.sunlight }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-600">Watering</label>
+                            {{ form.watering }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Growth Rate</label>
+                            {{ form.growth_rate }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-600">Ideal Location</label>
+                            {{ form.ideal_location }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-600">Maintenance Tips</label>
+                            {{ form.maintenance_tips }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-600">Key Benefits</label>
+                            {{ form.benefits }}
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form.pet_safe }}
+                                <label class="form-check-label ms-2" for="{{ form.pet_safe.id_for_label }}">
+                                    This Plant is Pet-Safe
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label ms-2" for="{{ form.is_active.id_for_label }}">
+                                    Available for Sale Immediately
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary-custom py-3 fw-bold">
+                            {% if form.instance.pk %}Update Plant{% else %}List Product Now{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
