@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, Category, SubCategory
+from .models import Product, Category, SubCategory, Review
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -43,3 +43,12 @@ class ProductForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write your review here...'}),
+        }

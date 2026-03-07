@@ -14,10 +14,27 @@
             <h4 class="fw-bold mb-4">Shipping Information</h4>
             <form method="post">
                 {% csrf_token %}
+                {% if saved_addresses %}
+                <div class="mb-4 bg-light p-3 rounded-4">
+                    <label class="form-label fw-bold small text-uppercase text-success mb-2">Saved Addresses</label>
+                    <select id="address-selector" class="form-select rounded-pill border-0 shadow-sm mb-2" onchange="updateAddress(this)">
+                        <option value="">-- Choose an Address --</option>
+                        {% for addr in saved_addresses %}
+                        <option value="{{ addr.street_address }}, {{ addr.city }}, {{ addr.state }} - {{ addr.postal_code }}" 
+                                data-name="{{ addr.full_name }}" data-phone="{{ addr.phone_number }}"
+                                {% if addr.is_default %}selected{% endif %}>
+                            {{ addr.full_name }} ({{ addr.city }}) {% if addr.is_default %}[Default]{% endif %}
+                        </option>
+                        {% endfor %}
+                        <option value="NEW">-- Enter New Address --</option>
+                    </select>
+                </div>
+                {% endif %}
+
                 <div class="mb-4">
                     <label class="form-label fw-600">Full Delivery Address</label>
-                    <textarea name="address" class="form-control" rows="4"
-                        placeholder="House no, Street, Landmark, City, State, PIN" required></textarea>
+                    <textarea name="address" id="id_address" class="form-control" rows="4"
+                        placeholder="House no, Street, Landmark, City, State, PIN" required>{% if default_address %}{{ default_address.street_address }}, {{ default_address.city }}, {{ default_address.state }} - {{ default_address.postal_code }}{% endif %}</textarea>
                 </div>
 
                 <h4 class="fw-bold mb-4 mt-5">Payment Details</h4>
@@ -115,6 +132,16 @@
         }
     }
 
+    function updateAddress(select) {
+        const textarea = document.getElementById('id_address');
+        if (select.value === 'NEW') {
+            textarea.value = '';
+            textarea.focus();
+        } else if (select.value !== "") {
+            textarea.value = select.value;
+        }
+    }
+
     const form = document.querySelector('form');
     const submitButton = document.getElementById('submit-button');
     const spinner = document.getElementById('spinner');
@@ -155,7 +182,7 @@
             const { error } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
-                    return_url: window.location.origin + "{% url 'cart:payment_success' %}?address=" + encodeURIComponent(document.querySelector('[name=address]').value),
+                    return_url: window.location.origin + "{% url 'cart:payment_success' %}?address=" + encodeURIComponent(document.querySelector('#id_address').value),
                 },
             });
 

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}My Addresses - PlantCart{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="fw-bold text-success mb-1">My Address Book</h1>
+            <p class="text-muted small mb-0">Manage your shipping addresses for faster checkout</p>
+        </div>
+        <a href="{% url 'accounts:address_add' %}" class="btn btn-premium btn-premium-solid py-2 px-4 shadow-none">
+            <i class="fas fa-plus me-2"></i> Add New Address
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for address in addresses %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100 {% if address.is_default %}border-top border-4 border-success{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="fw-bold mb-0">{{ address.full_name }}</h5>
+                    {% if address.is_default %}
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small" style="font-size: 0.6rem;">DEFAULT</span>
+                    {% endif %}
+                </div>
+                <div class="text-muted small mb-4">
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i> {{ address.phone_number }}</p>
+                    <p class="mb-0"><i class="fas fa-location-dot me-2"></i> {{ address.street_address }}</p>
+                    <p class="mb-0 ms-4">{{ address.city }}, {{ address.state }} - {{ address.postal_code }}</p>
+                </div>
+                <div class="d-flex gap-2 mt-auto pt-3 border-top border-opacity-10">
+                    {% if not address.is_default %}
+                    <a href="{% url 'accounts:address_default' address.pk %}" class="btn btn-light-green btn-sm rounded-pill px-3 text-success fw-bold flex-grow-1" style="font-size: 0.7rem;">Set Default</a>
+                    {% endif %}
+                    <a href="{% url 'accounts:address_delete' address.pk %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold {% if not address.is_default %}flex-grow-1{% else %}w-100{% endif %}" style="font-size: 0.7rem;" onclick="return confirm('Delete this address?')">Delete</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+            <i class="fas fa-map-location-dot fa-3x text-muted mb-3 opacity-25"></i>
+            <h5 class="text-muted">No addresses saved yet</h5>
+            <p class="text-muted small">Add a shipping address to speed up your future orders!</p>
+            <a href="{% url 'accounts:address_add' %}" class="btn btn-success rounded-pill px-4 mt-3">Add Address Now</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-5">
+        <a href="{% url 'accounts:customer_profile' %}" class="text-success text-decoration-none small fw-bold">
+            <i class="fas fa-arrow-left me-2"></i> Back to Profile
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -3,9 +3,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.db import models as db_models
-from .models import Category, SubCategory, Product
+from .models import Category, SubCategory, Product, Review
 from cart.models import OrderItem
-from .forms import ProductForm
+from .forms import ProductForm, ReviewForm
 from accounts.forms import ContactForm
 from django.contrib import messages
 
@@ -33,7 +33,32 @@ class VendorDashboardView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_approved'] = self.request.user.is_approved
+        user = self.request.user
+        context['is_approved'] = user.is_approved
+        
+        # Analytics
+        vendor_items = OrderItem.objects.filter(product__vendor=user).exclude(order__status='CANCELLED')
+        
+        # 1. Total Revenue
+        total_revenue = vendor_items.aggregate(
+            total=db_models.Sum(db_models.F('price') * db_models.F('quantity'), output_field=db_models.DecimalField())
+        )['total'] or 0
+        context['total_revenue'] = total_revenue
+        
+        # 2. Total Orders (Distinct orders containing vendor's products)
+        total_orders = vendor_items.values('order').distinct().count()
+        context['total_orders'] = total_orders
+        
+        # 3. Top Selling Products
+        top_selling = Product.objects.filter(vendor=user).annotate(
+            total_sold=db_models.Sum('orderitem__quantity')
+        ).filter(total_sold__gt=0).order_by('-total_sold')[:3]
+        context['top_selling'] = top_selling
+        
+        # 4. Total Stock units
+        total_stock = self.get_queryset().aggregate(total=db_models.Sum('stock'))['total'] or 0
+        context['total_stock'] = total_stock
+
         return context
 
 class VendorOrderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -140,6 +165,51 @@ class ProductDetailView(DetailView):
     template_name = 'products/product_detail.html'
     context_object_name = 'product'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['review_form'] = ReviewForm()
+        context['reviews'] = self.object.reviews.all()
+        # Check if user has already reviewed and if they have purchased the product
+        if self.request.user.is_authenticated:
+            context['user_review'] = self.object.reviews.filter(user=self.request.user).first()
+            # Check for delivered order of this product
+            has_purchased = OrderItem.objects.filter(
+                order__user=self.request.user, 
+                product=self.object, 
+                status='DELIVERED'
+            ).exists()
+            context['has_purchased'] = has_purchased
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('accounts:login')
+        
+        self.object = self.get_object()
+        
+        # Check if user has purchased the product
+        has_purchased = OrderItem.objects.filter(
+            order__user=request.user, 
+            product=self.object, 
+            status='DELIVERED'
+        ).exists()
+        
+        if not has_purchased:
+            messages.error(request, "You can only review products you have purchased and received.")
+            return redirect('products:product_detail', slug=self.object.slug)
+
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = self.object
+            review.user = request.user
+            try:
+                review.save()
+                messages.success(request, "Review submitted successfully!")
+            except:
+                messages.error(request, "You have already reviewed this product.")
+        return redirect('products:product_detail', slug=self.object.slug)
+
 class CategoryProductListView(ListView):
     model = Product
     template_name = 'products/category_products.html'
@@ -174,6 +244,15 @@ class ShopListView(ListView):
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True).order_by('-created_at')
         
+        # Search functionality
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                db_models.Q(name__icontains=query) | 
+                db_models.Q(description__icontains=query) |
+                db_models.Q(scientific_name__icontains=query)
+            )
+
         category_slug = self.request.GET.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)

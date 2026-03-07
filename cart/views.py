@@ -157,11 +157,17 @@ def checkout(request):
         messages.success(request, "Order placed successfully!")
         return redirect('cart:order_success', order_id=order.id)
         
+    # Get saved addresses for selection
+    saved_addresses = request.user.addresses.all()
+    default_address = saved_addresses.filter(is_default=True).first()
+
     return render(request, 'cart/checkout.html', {
         'cart_items': cart_items, 
         'total': total, 
         'client_secret': client_secret,
-        'STRIPE_PUBLIC_KEY': STRIPE_PUBLIC_KEY
+        'STRIPE_PUBLIC_KEY': STRIPE_PUBLIC_KEY,
+        'saved_addresses': saved_addresses,
+        'default_address': default_address
     })
 
 @login_required

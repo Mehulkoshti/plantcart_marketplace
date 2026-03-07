@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, ContactMessage
+from .models import User, ContactMessage, Address
 
 class UserRegistrationForm(UserCreationForm):
     role = forms.ChoiceField(choices=(('VENDOR', 'Vendor'), ('CUSTOMER', 'Customer')), widget=forms.RadioSelect)
@@ -62,3 +62,19 @@ class CustomerProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Address
+        fields = ['full_name', 'phone_number', 'street_address', 'city', 'state', 'postal_code', 'is_default']
+        widgets = {
+            'street_address': forms.Textarea(attrs={'rows': 2}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs['class'] = 'form-control'
+            else:
+                field.widget.attrs['class'] = 'form-check-input'

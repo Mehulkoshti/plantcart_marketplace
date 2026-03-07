@@ -18,10 +18,10 @@
     <div class="col-md-6">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'products:home' %}" class="text-success">Shop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:home' %}" class="text-success small text-decoration-none">Shop</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'products:category_products' product.category.slug %}"
-                        class="text-success">{{ product.category.name }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+                        class="text-success small text-decoration-none">{{ product.category.name }}</a></li>
+                <li class="breadcrumb-item active small" aria-current="page">{{ product.name }}</li>
             </ol>
         </nav>
 
@@ -109,7 +109,7 @@
         </div>
 
         {% if product.benefits %}
-        <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary bg-opacity-10">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary bg-opacity-10 border-0">
             <h4 class="fw-bold mb-3 text-primary"><i class="fas fa-sparkles me-2"></i> Key Benefits</h4>
             <p class="mb-0 text-muted">{{ product.benefits }}</p>
         </div>
@@ -137,4 +137,99 @@
         </div>
     </div>
 </div>
+
+<!-- Reviews Section -->
+<div class="row mt-5 animate-fade-in">
+    <div class="col-12">
+        <hr class="mb-5 opacity-10">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h3 class="fw-bold mb-1">Customer Reviews</h3>
+                <p class="text-muted small mb-0">{{ reviews.count }} verified purchases share their experience</p>
+            </div>
+            {% if user.is_authenticated %}
+                {% if not user_review and has_purchased %}
+                    <button class="btn btn-premium btn-premium-solid py-2 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#reviewFormCollapse">
+                        Write a Review
+                    </button>
+                {% elif user_review %}
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">You already reviewed this</span>
+                {% elif not has_purchased %}
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2" title="Only verified buyers can review">Purchase to review</span>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-outline-success rounded-pill px-4">Login to Review</a>
+            {% endif %}
+        </div>
+
+        <!-- Add Review Form -->
+        {% if user.is_authenticated and not user_review and has_purchased %}
+            <div class="collapse mb-5" id="reviewFormCollapse">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                    <h5 class="fw-bold mb-3 text-success">Share Your Feedback</h5>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold small text-uppercase">Your Rating</label>
+                                {{ review_form.rating }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small text-uppercase">Your Experience</label>
+                                {{ review_form.comment }}
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold">Post Review</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Reviews List -->
+        <div class="row g-4">
+            {% for review in reviews %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 transition-hover border-top border-5 border-success border-opacity-10">
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted opacity-25"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ review.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <p class="mb-4 text-dark-emphasis italic" style="font-style: italic;">"{{ review.comment }}"</p>
+                    <div class="d-flex align-items-center gap-3 mt-auto pt-3 border-top border-opacity-10">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center fw-bold text-success" style="width: 35px; height: 35px; font-size: 0.8rem;">
+                            {{ review.user.first_name|first|upper }}
+                        </div>
+                        <div>
+                            <p class="small fw-bold mb-0 text-dark">{{ review.user.first_name }}</p>
+                            <p class="text-muted mb-0" style="font-size: 0.65rem;">Verified Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+                <i class="fas fa-edit fa-3x text-muted mb-3 opacity-25"></i>
+                <h5 class="text-muted">No reviews yet</h5>
+                <p class="text-muted small">Be the first to share your thoughts about this plant!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .italic { font-style: italic; }
+    .transition-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .transition-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }
+</style>
 {% endblock %}

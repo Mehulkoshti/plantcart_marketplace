@@ -62,15 +62,15 @@
                                     class="form-select form-select-sm rounded-pill border-0 shadow-sm bg-light"
                                     onchange="this.form.submit()"
                                     style="font-size: 0.85rem; font-weight: 500; cursor: pointer;">
-                                    <option value="PENDING" {% if item.status=='PENDING' %}selected{% endif %}
+                                    <option value="PENDING" {% if item.status == 'PENDING' %}selected{% endif %}
                                         class="text-warning">Pending</option>
-                                    <option value="PROCESSING" {% if item.status=='PROCESSING' %}selected{% endif %}
+                                    <option value="PROCESSING" {% if item.status == 'PROCESSING' %}selected{% endif %}
                                         class="text-info">Processing</option>
-                                    <option value="SHIPPED" {% if item.status=='SHIPPED' %}selected{% endif %}
+                                    <option value="SHIPPED" {% if item.status == 'SHIPPED' %}selected{% endif %}
                                         class="text-primary">Shipped</option>
-                                    <option value="DELIVERED" {% if item.status=='DELIVERED' %}selected{% endif %}
+                                    <option value="DELIVERED" {% if item.status == 'DELIVERED' %}selected{% endif %}
                                         class="text-success">Delivered</option>
-                                    <option value="CANCELLED" {% if item.status=='CANCELLED' %}selected{% endif %}
+                                    <option value="CANCELLED" {% if item.status == 'CANCELLED' %}selected{% endif %}
                                         class="text-danger">Cancelled</option>
                                 </select>
                             </form>

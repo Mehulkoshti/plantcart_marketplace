@@ -39,9 +39,14 @@
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
-                        <a href="{% url 'products:home' %}" class="btn btn-light px-4">Cancel</a>
-                        <button type="submit" class="btn btn-primary-custom px-5">Save Changes</button>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-5">
+                        <a href="{% url 'accounts:address_list' %}" class="btn btn-outline-success px-4 rounded-pill">
+                            <i class="fas fa-map-marker-alt me-2"></i> Manage Addresses
+                        </a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'products:home' %}" class="btn btn-light px-4 rounded-pill">Cancel</a>
+                            <button type="submit" class="btn btn-primary-custom px-5">Save Changes</button>
+                        </div>
                     </div>
                 </form>
             </div>

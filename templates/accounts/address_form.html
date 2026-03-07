@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Add Address - PlantCart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-success">Add New Address</h2>
+                <p class="text-muted">Save your shipping details for future orders</p>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="form-label fw-bold small text-uppercase">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small text-uppercase">Phone Number</label>
+                        {{ form.phone_number }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small text-uppercase">Street Address</label>
+                        {{ form.street_address }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-uppercase">City</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-uppercase">State</label>
+                        {{ form.state }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-uppercase">Postal Code</label>
+                        {{ form.postal_code }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch bg-light p-3 rounded-4 ps-5">
+                            {{ form.is_default }}
+                            <label class="form-check-label fw-bold small text-uppercase ms-2" for="{{ form.is_default.id_for_label }}">Set as default shipping address</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-5">
+                        <button type="submit" class="btn btn-premium btn-premium-solid w-100 py-3 fw-bold">Save Address</button>
+                        <a href="{% url 'accounts:address_list' %}" class="btn btn-outline-secondary w-100 py-3 mt-3 rounded-pill fw-bold border-0 shadow-none">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
