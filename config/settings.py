@@ -92,7 +92,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'ssl': {'ca': os.environ.get('DB_SSL_CA')} if os.environ.get('DB_SSL_CA') else {},
+            'ssl': {'ca': os.environ.get('DB_SSL_CA')} if os.environ.get('DB_SSL_CA') else {'ca': None},
         },
     }
 }
@@ -145,11 +145,36 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = "/"
+
+# Logging Configuration for Vercel
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 # Stripe Payment Configuration (Test Mode)
 # Replace with your actual Test API Keys from https://dashboard.stripe.com/test/apikeys
