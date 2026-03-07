@@ -92,7 +92,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'ssl': {'ca': os.environ.get('DB_SSL_CA')} if os.environ.get('DB_SSL_CA') else {'ca': None},
+            'ssl': {'ca': os.environ.get('DB_SSL_CA')} if os.environ.get('DB_SSL_CA') else {'ssl': {}},
         },
     }
 }
