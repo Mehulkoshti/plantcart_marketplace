@@ -1,0 +1,57 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block header_title %}Order Management{% endblock %}
+{% block header_subtitle %}Track and manage all customer purchases{% endblock %}
+
+{% block content %}
+<div class="glass-card mt-2">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th class="border-0">Order ID</th>
+                    <th class="border-0">Customer</th>
+                    <th class="border-0">Amount</th>
+                    <th class="border-0">Status</th>
+                    <th class="border-0">Date</th>
+                    <th class="border-0 text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td class="fw-bold">#{{ order.id }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-dark fw-semibold">{{ order.user.full_name }}</span>
+                        </div>
+                    </td>
+                    <td class="fw-bold text-success">₹{{ order.total_amount }}</td>
+                    <td>
+                        {% if order.status == 'DELIVERED' %}
+                        <span class="status-badge status-approved">Delivered</span>
+                        {% elif order.status == 'PENDING' %}
+                        <span class="status-badge status-pending">Pending</span>
+                        {% elif order.status == 'CANCELLED' %}
+                        <span class="status-badge status-rejected">Cancelled</span>
+                        {% else %}
+                        <span class="status-badge bg-light text-dark">Processing</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">{{ order.created_at|date:"d M, Y" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'admin_panel:order_detail' order.id %}" class="btn btn-sm btn-light rounded-pill px-3">View Details</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">No orders found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

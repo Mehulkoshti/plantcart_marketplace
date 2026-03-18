@@ -39,7 +39,7 @@ class UserLoginView(LoginView):
         user = self.request.user
 
         if user.role == "ADMIN":
-            return "/admin/"
+            return reverse_lazy("admin_panel:dashboard")
         elif user.role == "VENDOR":
             return reverse_lazy("products:vendor_dashboard")
         else:

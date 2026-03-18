@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | PlantCart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f3d2e;
+            background-image: linear-gradient(135deg, #0f3d2e 0%, #1a5c48 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 3.5rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f3d2e;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #ddd;
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-login {
+            background: #0f3d2e;
+            color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            width: 100%;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3fa34d;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <div class="brand-logo">
+            <i class="fas fa-leaf text-success me-2"></i> PlantCart Admin
+        </div>
+
+        <h5 class="text-center mb-4 fw-bold">Sign in to Management Suite</h5>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 py-2 small"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="padding: 0.8rem;"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger rounded-4 border-0 shadow-sm mb-4 py-2 small" role="alert">
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <div>{{ error }}</div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Email Address</label>
+                <input type="email" name="username" class="form-control" placeholder="admin@plantcart.com" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-login mb-3">Login to Dashboard</button>
+            <div class="text-center">
+                <a href="{% url 'products:home' %}" class="text-decoration-none text-muted small">Return to
+                    Storefront</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantCart Admin | {% block title %}{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --deep-forest: #0F3D2E;
+            --fresh-leaf: #3FA34D;
+            --soft-cream: #F8F9F2;
+            --luxury-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--deep-forest);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white !important;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .nav-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.7) !important;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            text-decoration: none !important;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .nav-link.active {
+            background-color: var(--fresh-leaf);
+        }
+
+        /* Main Content Styling */
+        .main-container {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            box-shadow: var(--luxury-shadow);
+            font-size: 1.2rem;
+            color: var(--deep-forest);
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 24px;
+            box-shadow: var(--luxury-shadow);
+            padding: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-premium {
+            background-color: var(--deep-forest);
+            color: white;
+            border-radius: 12px;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-premium:hover {
+            background-color: var(--fresh-leaf);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-approved { background: #e6f4ea; color: #1e7e34; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            :root {
+                --sidebar-width: 240px;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .mobile-toggle {
+                display: flex;
+            }
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width));
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-container {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(2px);
+                z-index: 999;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .top-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .top-header > div:last-child {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4 d-lg-none">
+            <span class="fw-bold">Menu</span>
+            <button class="btn btn-sm text-white border-0" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <a href="{% url 'admin_panel:dashboard' %}" class="sidebar-brand">
+            <i class="fas fa-leaf text-success"></i> PlantCart Admin
+        </a>
+        
+        <nav class="nav-container">
+            <a href="{% url 'admin_panel:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{% url 'admin_panel:vendor_list' %}" class="nav-link {% if 'vendor' in request.path %}active{% endif %}">
+                <i class="fas fa-store"></i> Vendors
+            </a>
+            <a href="{% url 'admin_panel:category_list' %}" class="nav-link {% if 'categories' in request.path and 'sub' not in request.path %}active{% endif %}">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a href="{% url 'admin_panel:subcategory_list' %}" class="nav-link {% if 'subcategories' in request.path %}active{% endif %}">
+                <i class="fas fa-list-ul"></i> Sub-categories
+            </a>
+            <a href="{% url 'admin_panel:product_list' %}" class="nav-link {% if 'product' in request.path %}active{% endif %}">
+                <i class="fas fa-boxes"></i> Products
+            </a>
+            <a href="{% url 'admin_panel:order_list' %}" class="nav-link {% if 'order' in request.path %}active{% endif %}">
+                <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+            <a href="{% url 'admin_panel:reports' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+            <a href="{% url 'admin_panel:contact_messages' %}" class="nav-link {% if 'contact-messages' in request.path %}active{% endif %}">
+                <i class="fas fa-envelope"></i> Messages
+            </a>
+            <a href="{% url 'products:home' %}" class="nav-link">
+                <i class="fas fa-external-link-alt"></i> Visit Site
+            </a>
+            <hr style="opacity: 0.1; margin: 1.5rem 0; flex-shrink: 0;">
+            <a href="{% url 'accounts:logout' %}" class="nav-link text-danger mt-auto mb-3" style="flex-shrink: 0;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-container">
+        <header class="top-header">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h2 class="fw-bold mb-0">{% block header_title %}Welcome back, Admin{% endblock %}</h2>
+                    <p class="text-muted small mb-0">{% block header_subtitle %}Overview of your marketplace today{% endblock %}</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="glass-card py-2 px-3 d-flex align-items-center gap-2">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0F3D2E&color=fff" class="rounded-circle" width="32">
+                    <span class="fw-semibold">{{ user.full_name }}</span>
+                </div>
+            </div>
+        </header>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+
+        if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+        if (closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on window resize if moving to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 991 && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

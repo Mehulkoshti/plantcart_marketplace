@@ -24,10 +24,10 @@
 
                         <div class="text-start mt-5">
                             <p class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> {{ user.email }}</p>
-                            <p class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> {{
-                                user.phone_number|default:"No phone set" }}</p>
-                            <p class="mb-0"><i class="fas fa-calendar-check me-2 text-primary"></i> Member since {{
-                                user.date_joined|date:"M Y" }}</p>
+                            <p class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> 
+                                {{ user.phone_number|default:"No phone set" }}</p>
+                            <p class="mb-0"><i class="fas fa-calendar-check me-2 text-primary"></i> Member since 
+                                {{ user.date_joined|date:"M Y" }}</p>
                         </div>
                     </div>
 

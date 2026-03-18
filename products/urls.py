@@ -13,10 +13,8 @@ urlpatterns = [
     path('product/<slug:slug>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
     path('product/<slug:slug>/toggle-status/', views.toggle_product_status, name='product_toggle_status'),
     path('product/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
-    path('category/<slug:slug>/', views.CategoryProductListView.as_view(), name='category_products'),
     path('shop/', views.ShopListView.as_view(), name='all_products'),
 
     path('about/', views.AboutUsView.as_view(), name='about'),
     path('contact/', views.ContactUsView.as_view(), name='contact_us'),
-    path('become-vendor/', views.BecomeVendorView.as_view(), name='become_vendor'),
 ]

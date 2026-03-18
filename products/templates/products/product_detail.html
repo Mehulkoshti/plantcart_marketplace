@@ -19,7 +19,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'products:home' %}" class="text-success small text-decoration-none">Shop</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'products:category_products' product.category.slug %}"
+                <li class="breadcrumb-item"><a href="{% url 'products:all_products' %}?category={{ product.category.slug }}"
                         class="text-success small text-decoration-none">{{ product.category.name }}</a></li>
                 <li class="breadcrumb-item active small" aria-current="page">{{ product.name }}</li>
             </ol>
@@ -83,30 +83,35 @@
             </a>
         </div>
 
+        {% if product.scientific_name or product.care_level or product.growth_rate or product.ideal_location %}
         <div class="mt-5 pt-4 border-top">
             <h5 class="fw-bold mb-3">Plant Details</h5>
             <div class="row g-2 small text-muted">
-                <div class="col-6"><strong>Scientific Name:</strong>
-                    {{ product.scientific_name|default:"Not available" }}</div>
+                {% if product.scientific_name %}
+                <div class="col-6"><strong>Scientific Name:</strong> {{ product.scientific_name }}</div>
+                {% endif %}
                 <div class="col-6"><strong>Care Level:</strong> {{ product.care_level }}</div>
                 <div class="col-6"><strong>Growth Rate:</strong> {{ product.growth_rate }}</div>
-                <div class="col-6"><strong>Ideal Location:</strong>
-                    {{ product.ideal_location|default:"Indoor/Outdoor" }}</div>
+                {% if product.ideal_location %}
+                <div class="col-6"><strong>Ideal Location:</strong> {{ product.ideal_location }}</div>
+                {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
 <div class="row mt-5">
     <div class="col-lg-8">
+        {% if product.maintenance_tips %}
         <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
             <h4 class="fw-bold mb-4 text-success"><i class="fas fa-leaf me-2"></i> How to Care for Your
                 {{ product.name }}</h4>
             <div class="maintenance-tips text-muted mb-0">
-                {{ product.maintenance_tips|linebreaks|default:"Place in indirect sunlight and water when the top inch
-                of soil feels dry." }}
+                {{ product.maintenance_tips|linebreaks }}
             </div>
         </div>
+        {% endif %}
 
         {% if product.benefits %}
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary bg-opacity-10 border-0">

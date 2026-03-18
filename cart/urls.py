@@ -19,4 +19,5 @@ urlpatterns = [
     
     # User Orders
     path('my-orders/', views.user_orders, name='user_orders'),
+    path('order/<int:pk>/invoice/', views.view_invoice, name='view_invoice'),
 ]

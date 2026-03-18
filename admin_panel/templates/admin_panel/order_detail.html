@@ -1,0 +1,118 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Order #{{ order.id }} Details{% endblock %}
+
+{% block header_title %}Order Details{% endblock %}
+{% block header_subtitle %}Detailed summary for Transaction #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Main Order Info -->
+    <div class="col-lg-8">
+        <div class="glass-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Ordered Items</h5>
+                <span class="badge rounded-pill 
+                    {% if order.status == 'DELIVERED' %}bg-success
+                    {% elif order.status == 'PENDING' %}bg-warning
+                    {% elif order.status == 'CANCELLED' %}bg-danger
+                    {% else %}bg-primary{% endif %} px-3">
+                    {{ order.status }}
+                </span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">Product</th>
+                            <th class="border-0">Vendor</th>
+                            <th class="border-0 text-center">Qty</th>
+                            <th class="border-0 text-end">Price</th>
+                            <th class="border-0 text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" class="rounded-3" width="45" height="45" style="object-fit: cover;">
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
+                                        <span class="text-muted small">Category: {{ item.product.category.name }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">{{ item.product.vendor.shop_name }}</span>
+                            </td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">₹{{ item.price }}</td>
+                            <td class="text-end fw-bold">₹{{ item.price|add:0 }}</td> <!-- Total per item row if needed -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold">Grand Total</td>
+                            <td class="text-end fw-bold text-success fs-5">₹{{ order.total_amount }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="fw-bold mb-4">Shipping Information</h5>
+            <div class="p-3 bg-light rounded-3 border">
+                <p class="mb-0 text-dark">{{ order.address|linebreaksbr }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-lg-4">
+        <div class="glass-card mb-4">
+            <h5 class="fw-bold mb-4">Customer Details</h5>
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="fas fa-user fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">{{ order.user.full_name }}</h6>
+                    <span class="text-muted small">{{ order.user.email }}</span>
+                </div>
+            </div>
+            <hr>
+            <div class="d-grid gap-2">
+                <div class="d-flex justify-content-between small">
+                    <span class="text-muted">Order Date</span>
+                    <span class="fw-bold">{{ order.created_at|date:"d M Y, h:i A" }}</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span class="text-muted">Payment Type</span>
+                    <span class="fw-bold text-primary">COD</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h5 class="fw-bold mb-4">Order Actions</h5>
+            <div class="d-grid gap-3">
+                <a href="{% url 'admin_panel:generate_invoice' order.id %}" target="_blank" class="btn btn-premium btn-light border text-start">
+                    <i class="fas fa-print me-2"></i> Print Invoice
+                </a>
+                <a href="mailto:{{ order.user.email }}" class="btn btn-premium btn-light border text-start">
+                    <i class="fas fa-envelope me-2"></i> Contact Customer
+                </a>
+                <a href="{% url 'admin_panel:order_list' %}" class="btn btn-premium btn-dark text-start">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Product: {{ product.name }}{% endblock %}
+
+{% block header_title %}Product Detail{% endblock %}
+{% block header_subtitle %}Full specifications for {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="glass-card h-100 p-2">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid rounded-4 w-100" style="height: 400px; object-fit: cover;">
+            {% else %}
+            <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 400px;">
+                <i class="fas fa-leaf fa-5x text-muted opacity-10"></i>
+            </div>
+            {% endif %}
+            
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h3 class="fw-bold mb-1">{{ product.name }}</h3>
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">{{ product.category.name }}</span>
+                    </div>
+                    <div class="text-end">
+                        <h3 class="fw-bold text-success mb-0">₹{{ product.price }}</h3>
+                        <span class="text-muted small">M.R.P</span>
+                    </div>
+                </div>
+                <p class="text-muted">{{ product.description }}</p>
+                <div class="d-flex gap-4 mt-4">
+                    <div class="text-center">
+                        <div class="h4 fw-bold mb-0">{{ product.stock }}</div>
+                        <span class="text-muted small">In Stock</span>
+                    </div>
+                    <div class="text-center">
+                        <div class="h4 fw-bold mb-0">12</div> <!-- Placeholder for total sales if needed -->
+                        <span class="text-muted small">Total Sales</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4">Vendor Information</h5>
+                    <div class="d-flex align-items-center gap-4 p-3 bg-light rounded-4 border">
+                        {% if product.vendor.shop_image %}
+                        <img src="{{ product.vendor.shop_image.url }}" class="rounded-circle border" width="60" height="60" style="object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-store fs-4"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ product.vendor.shop_name }}</h6>
+                            <p class="mb-0 text-muted small"><i class="fas fa-user-circle me-1"></i> {{ product.vendor.full_name }}</p>
+                        </div>
+                        <div class="ms-auto">
+                            <a href="{% url 'admin_panel:vendor_detail' product.vendor.pk %}" class="btn btn-sm btn- premium border rounded-pill px-4">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4">Plant Specifications</h5>
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="text-muted small d-block mb-1">Scientific Name</label>
+                                <span class="fw-bold">{{ product.scientific_name|default:"N/A" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="text-muted small d-block mb-1">Care Level</label>
+                                <span class="fw-bold">{{ product.care_level|default:"Beginner" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="text-muted small d-block mb-1">Sunlight</label>
+                                <span class="fw-bold">{{ product.sunlight|default:"Partial Shade" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 border rounded-3 bg-white">
+                                <label class="text-muted small d-block mb-1">Watering</label>
+                                <span class="fw-bold">{{ product.watering|default:"Every 2 days" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="glass-card">
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'admin_panel:product_list' %}" class="btn btn-premium btn-dark px-5">Back to Directory</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

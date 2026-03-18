@@ -59,5 +59,9 @@ class OrderItem(models.Model):
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
 
+    @property
+    def total_price(self):
+        return self.quantity * self.price
+
     def __str__(self):
         return f"{self.quantity} x {self.product.name} (Order #{self.order.id})"

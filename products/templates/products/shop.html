@@ -1,43 +1,125 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Shop - PlantCart{% endblock %}
+{% block title %}Shop - PlantCart Marketplace{% endblock %}
 
 {% block content %}
-<div class="animate-fade-in">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h1 class="fw-bold text-primary-green">Our Plant Collection</h1>
-            <p class="text-muted">Explore the widest variety of plants from across the country.</p>
+<div class="shop-container animate-fade-in py-4">
+    <!-- Header Section -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-primary-green mb-1">Marketplace</h1>
+            <p class="text-muted mb-0">Discover thousands of unique plants from local nurseries.</p>
         </div>
-        <div class="d-flex gap-3">
-            <select class="form-select rounded-pill px-4" onchange="window.location.href=this.value">
-                <option value="?sort=newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>Newest First</option>
-                <option value="?sort=price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to
-                    High</option>
-                <option value="?sort=price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High
-                    to Low</option>
-            </select>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="d-flex justify-content-md-end gap-2">
+                <!-- Mobile Filter Trigger -->
+                <button class="btn btn-outline-success rounded-pill px-4 d-lg-none" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#mobileFilter">
+                    <i class="fas fa-sliders-h me-2"></i> Filters
+                </button>
+                <select class="form-select rounded-pill px-4 w-auto shadow-sm" onchange="applySort(this.value)">
+                    <option value="newest" {% if request.GET.sort == 'newest' or not request.GET.sort %}selected{% endif %}>Newest First</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to
+                        High</option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name: A to Z</option>
+                </select>
+            </div>
         </div>
     </div>
 
+    <!-- Active Filters Tags -->
+    {% if request.GET.category or request.GET.subcategory or request.GET.min_price or request.GET.max_price or request.GET.q %}
+    <div class="d-flex flex-wrap gap-2 mb-4 align-items-center">
+        <span class="text-muted small fw-bold">Active Filters:</span>
+        {% if request.GET.q %}
+        <span class="badge bg-light-green text-primary-green border px-3 py-2 rounded-pill">
+            Search: "{{ request.GET.q }}" <a
+                href="?{% for k,v in request.GET.items %}{% if k != 'q' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
+                class="ms-1 text-primary-green"><i class="fas fa-times-circle"></i></a>
+        </span>
+        {% endif %}
+        {% if request.GET.category %}
+        <span class="badge bg-light-green text-primary-green border px-3 py-2 rounded-pill">
+            Category: {{ request.GET.category }} <a
+                href="?{% for k,v in request.GET.items %}{% if k != 'category' and k != 'subcategory' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
+                class="ms-1 text-primary-green"><i class="fas fa-times-circle"></i></a>
+        </span>
+        {% endif %}
+        {% if request.GET.subcategory %}
+        <span class="badge bg-light-green text-primary-green border px-3 py-2 rounded-pill">
+            Sub: {{ request.GET.subcategory }} <a
+                href="?{% for k,v in request.GET.items %}{% if k != 'subcategory' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
+                class="ms-1 text-primary-green"><i class="fas fa-times-circle"></i></a>
+        </span>
+        {% endif %}
+        <a href="{% url 'products:all_products' %}" class="text-danger small fw-bold text-decoration-none ms-2">Clear
+            All</a>
+    </div>
+    {% endif %}
+
     <div class="row g-4">
-        <!-- Sidebar Filters -->
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
-                <h5 class="fw-bold mb-4">Categories</h5>
-                <div class="list-group list-group-flush border-0">
-                    <a href="{% url 'products:all_products' %}"
-                        class="list-group-item list-group-item-action border-0 rounded-3 mb-2 {% if not request.GET.category %}bg-light-green text-primary-green fw-bold{% endif %}">
-                        All Categories
-                    </a>
-                    {% for cat in categories %}
-                    <a href="?category={{ cat.slug }}"
-                        class="list-group-item list-group-item-action border-0 rounded-3 mb-2 {% if request.GET.category == cat.slug %}bg-light-green text-primary-green fw-bold{% endif %}">
-                        {{ cat.name }}
-                        <span class="badge bg-white text-dark border float-end">{{ cat.products.count }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
+        <!-- Desktop Sidebar (Hidden on Mobile) -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="filter-sidebar sticky-top" style="top: 100px;">
+                <form id="filterFormDesktop" method="GET">
+                    <!-- Preserve search and sort -->
+                    {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                    {% if request.GET.sort %}<input type="hidden" name="sort" value="{{ request.GET.sort }}">{% endif %}
+
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                        <h5 class="fw-bold mb-4"><i class="fas fa-leaf text-success me-2"></i>Categories</h5>
+                        <div class="accordion accordion-flush" id="categoryAccordion">
+                            {% for cat in categories %}
+                            <div class="accordion-item border-0">
+                                <h2 class="accordion-header" id="flush-heading{{ forloop.counter }}">
+                                    <button
+                                        class="accordion-button collapsed px-0 bg-white shadow-none {% if request.GET.category == cat.slug %}text-primary-green fw-bold{% endif %}"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#flush-collapse{{ forloop.counter }}">
+                                        {{ cat.name }}
+                                    </button>
+                                </h2>
+                                <div id="flush-collapse{{ forloop.counter }}"
+                                    class="accordion-collapse collapse {% if request.GET.category == cat.slug %}show{% endif %}"
+                                    data-bs-parent="#categoryAccordion">
+                                    <div class="accordion-body px-2 py-1">
+                                        <div class="list-group list-group-flush">
+                                            <a href="?category={{ cat.slug }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                                class="list-group-item list-group-item-action border-0 py-1 small ps-3 {% if request.GET.category == cat.slug and not request.GET.subcategory %}fw-bold text-success{% endif %}">
+                                                View All {{ cat.name }}
+                                            </a>
+                                            {% for sub in cat.subcategories.all %}
+                                            <a href="?category={{ cat.slug }}&subcategory={{ sub.slug }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}"
+                                                class="list-group-item list-group-item-action border-0 py-1 small ps-3 {% if request.GET.subcategory == sub.slug %}fw-bold text-success{% endif %}">
+                                                {{ sub.name }}
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold mb-4"><i class="fas fa-tag text-success me-2"></i>Price Range</h5>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="small text-muted mb-1">Min</label>
+                                <input type="number" name="min_price" class="form-control rounded-3" placeholder="₹0"
+                                    value="{{ request.GET.min_price }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="small text-muted mb-1">Max</label>
+                                <input type="number" name="max_price" class="form-control rounded-3"
+                                    placeholder="₹5000+" value="{{ request.GET.max_price }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary-green w-100 rounded-pill">Apply Filter</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -45,64 +127,97 @@
         <div class="col-lg-9">
             <div class="row g-4">
                 {% for product in products %}
-                <div class="col-12 col-md-4">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 product-card transition-hover">
-                        <div class="position-relative">
+                <div class="col-6 col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 product-card transition-hover position-relative" onclick="window.location.href='{% url 'products:product_detail' product.slug %}';" style="cursor: pointer;">
+                        <!-- Wishlist Button (Top Right) -->
+                        <a href="{% url 'cart:toggle_wishlist' product.id %}" class="wishlist-btn-corner shadow-sm rounded-circle" onclick="event.stopPropagation();">
+                            {% if product.id in wishlisted_product_ids %}
+                            <i class="fas fa-heart text-danger"></i>
+                            {% else %}
+                            <i class="far fa-heart text-danger"></i>
+                            {% endif %}
+                        </a>
+ 
+                        <div class="position-relative overflow-hidden">
                             {% if product.image %}
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
                                 style="height: 220px; object-fit: cover;">
                             {% else %}
                             <div class="bg-light d-flex align-items-center justify-content-center"
                                 style="height: 220px;">
-                                <i class="fas fa-image text-muted fa-3x"></i>
+                                <i class="fas fa-spa text-muted fa-3x"></i>
                             </div>
                             {% endif %}
-                            <a href="{% url 'cart:toggle_wishlist' product.id %}"
-                                class="btn btn-white btn-wishlist position-absolute top-0 end-0 m-2 shadow-sm rounded-circle">
-                                {% if product.id in wishlisted_product_ids %}
-                                <i class="fas fa-heart text-danger"></i>
-                                {% else %}
-                                <i class="far fa-heart text-danger"></i>
-                                {% endif %}
-                            </a>
-                            <span class="badge bg-success position-absolute bottom-0 start-0 m-2 rounded-pill px-3">
-                                {{ product.category.name }}</span>
+                            
+                            <!-- Category Badge Overlay -->
+                            <div class="position-absolute bottom-0 start-0 m-2">
+                                <span class="badge bg-blur text-white rounded-pill px-3">{{ product.category.name }}</span>
+                            </div>
                         </div>
-                        <div class="card-body p-3">
-                            <h6 class="fw-bold mb-1">{{ product.name }}</h6>
-                            <p class="text-muted small mb-2">{{ product.scientific_name|default:"" }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h6 fw-bold text-success mb-0">₹{{ product.price }}</span>
-                                <a href="{% url 'products:product_detail' product.slug %}"
-                                    class="btn btn-outline-success btn-sm rounded-pill px-3">View</a>
+ 
+                        <div class="card-body p-3 d-flex flex-column">
+                            <div class="mb-1">
+                                <h6 class="fw-bold mb-1 text-truncate">{{ product.name }}</h6>
+                                <span class="badge bg-light-green text-primary-green small">{{ product.subcategory.name }}</span>
+                            </div>
+                            <p class="text-muted mb-3" style="font-size: 0.75rem;">{{ product.scientific_name|default:"Botanical Name N/A" }}</p>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="h5 fw-bold text-success mb-0">₹{{ product.price }}</span>
+                                </div>
+                                <form action="{% url 'cart:add_to_cart' product.id %}" method="POST" onclick="event.stopPropagation();">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success w-100 rounded-pill shadow-none py-2 border-0">
+                                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12 text-center py-5">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h3>No products match your criteria</h3>
-                    <p>Try changing your filters or check back later.</p>
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-5x text-light-green"></i>
+                    </div>
+                    <h3 class="fw-bold">No plants found</h3>
+                    <p class="text-muted">Try adjusting your filters or search terms.</p>
+                    <a href="{% url 'products:all_products' %}"
+                        class="btn btn-primary-green rounded-pill px-4 mt-2">Clear All Filters</a>
                 </div>
                 {% endfor %}
             </div>
 
+            <!-- Pagination -->
             {% if is_paginated %}
             <nav class="mt-5">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link rounded-pill me-2 border-0 shadow-sm"
-                            href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    <li class="page-item">
+                        <a class="page-link rounded-circle me-2 border-0 shadow-sm d-flex align-items-center justify-content-center"
+                            href="?page={{ page_obj.previous_page_number }}&{{ query_params }}"
+                            style="width: 45px; height: 45px;">
+                            <i class="fas fa-chevron-left text-success"></i>
+                        </a>
+                    </li>
                     {% endif %}
 
-                    <li class="page-item active"><span
-                            class="page-link rounded-pill border-0 shadow-sm bg-primary-green px-4">Page {{
-                            page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                    <li class="page-item active">
+                        <span
+                            class="page-link rounded-pill border-0 shadow-sm bg-primary-green px-4 h-100 d-flex align-items-center">
+                            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
 
                     {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link rounded-pill ms-2 border-0 shadow-sm"
-                            href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    <li class="page-item">
+                        <a class="page-link rounded-circle ms-2 border-0 shadow-sm d-flex align-items-center justify-content-center"
+                            href="?page={{ page_obj.next_page_number }}&{{ query_params }}"
+                            style="width: 45px; height: 45px;">
+                            <i class="fas fa-chevron-right text-success"></i>
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </nav>
@@ -111,38 +226,176 @@
     </div>
 </div>
 
+<!-- Mobile Filter Offcanvas -->
+<div class="offcanvas offcanvas-start rounded-end-4" tabindex="-1" id="mobileFilter">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold">Filters</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="GET">
+            {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+            {% if request.GET.sort %}<input type="hidden" name="sort" value="{{ request.GET.sort }}">{% endif %}
+
+            <div class="mb-5">
+                <h6 class="fw-bold mb-3">Categories</h6>
+                <div class="accordion accordion-flush" id="mobileCategoryAccordion">
+                    {% for cat in categories %}
+                    <div class="accordion-item border-0">
+                        <h2 class="accordion-header">
+                            <button
+                                class="accordion-button collapsed px-0 shadow-none {% if request.GET.category == cat.slug %}text-primary-green fw-bold{% endif %}"
+                                type="button" data-bs-toggle="collapse"
+                                data-bs-target="#mobile-collapse{{ forloop.counter }}">
+                                {{ cat.name }}
+                            </button>
+                        </h2>
+                        <div id="mobile-collapse{{ forloop.counter }}"
+                            class="accordion-collapse collapse {% if request.GET.category == cat.slug %}show{% endif %}"
+                            data-bs-parent="#mobileCategoryAccordion">
+                            <div class="accordion-body px-0 py-1">
+                                <div class="list-group list-group-flush">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="category"
+                                            value="{{ cat.slug }}" id="mobCat{{ cat.id }}" 
+                                            {% if request.GET.category == cat.slug %}checked{% endif %}>
+                                        <label class="form-check-label" for="mobCat{{ cat.id }}">All {{ cat.name }}</label>
+                                    </div>
+                                    {% for sub in cat.subcategories.all %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="subcategory"
+                                            value="{{ sub.slug }}" id="mobSub{{ sub.id }}" 
+                                            {% if request.GET.subcategory == sub.slug %}checked{% endif %}>
+                                        <label class="form-check-label" for="mobSub{{ sub.id }}">{{ sub.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="fw-bold mb-3">Price Range</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" name="min_price" class="form-control rounded-3" placeholder="Min"
+                            value="{{ request.GET.min_price }}">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" name="max_price" class="form-control rounded-3" placeholder="Max"
+                            value="{{ request.GET.max_price }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-sticky bottom-0 bg-white pt-3 border-top">
+                <button type="submit" class="btn btn-primary-green w-100 rounded-pill py-2">Show Results</button>
+                <a href="{% url 'products:all_products' %}"
+                    class="btn btn-link text-muted w-100 mt-2 text-decoration-none">Clear All</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-    .transition-hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .bg-light-green {
+        background: #e8f5e9;
     }
 
-    .transition-hover:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    .text-primary-green {
+        color: #2e7d32;
     }
 
-    .btn-wishlist {
+    .btn-primary-green {
+        background: #2e7d32;
+        border-color: #2e7d32;
+        color: white;
+        transition: all 0.3s;
+    }
+
+    .btn-primary-green:hover {
+        background: #1b5e20;
+        border-color: #1b5e20;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .bg-blur {
+        background: rgba(46, 125, 50, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .shop-container {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Product Card Enhancements */
+    .product-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .wishlist-btn-corner {
+        position: absolute;
+        top: 10px;
+        right: 10px;
         width: 35px;
         height: 35px;
-        padding: 0;
+        background: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: white;
-        border: none;
         z-index: 10;
+        transition: transform 0.2s;
+        text-decoration: none;
     }
 
-    .btn-wishlist:hover {
-        background: var(--soft-cream);
+    .wishlist-btn-corner:hover {
+        transform: scale(1.1);
     }
 
-    .product-card .card-img-top {
-        transition: transform 0.6s ease;
+    .product-card img {
+        transition: transform 0.8s ease;
     }
 
-    .product-card:hover .card-img-top {
-        transform: scale(1.05);
+    .product-card:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+
+    /* Accordion Custom */
+    .accordion-button:not(.collapsed) {
+        color: #2e7d32;
+        background-color: transparent;
     }
 </style>
+
+<script>
+    function applySort(val) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', val);
+        window.location.search = urlParams.toString();
+    }
+</script>
 {% endblock %}

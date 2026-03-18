@@ -103,7 +103,10 @@ def checkout(request):
             )
             client_secret = intent.client_secret
         except Exception as e:
-            messages.error(request, str(e))
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Stripe PaymentIntent creation failed: {str(e)}", exc_info=True)
+            messages.error(request, f"Payment gateway error: {str(e)}")
 
     if request.method == 'POST':
         address = request.POST.get('address')
@@ -210,6 +213,9 @@ def payment_success(request):
             return redirect('cart:checkout')
             
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Stripe Payment verification failed: {str(e)}", exc_info=True)
         messages.error(request, f"Error verifying payment: {str(e)}")
         return redirect('cart:checkout')
 
@@ -222,3 +228,8 @@ def payment_cancel(request):
 def user_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'cart/user_orders.html', {'orders': orders})
+
+@login_required
+def view_invoice(request, pk):
+    order = get_object_or_404(Order, pk=pk, user=request.user)
+    return render(request, 'cart/invoice.html', {'order': order})

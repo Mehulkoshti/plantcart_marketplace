@@ -211,7 +211,7 @@
 
         <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5">
             {% for category in categories|slice:":6" %}
-            <a href="{% url 'products:category_products' category.slug %}"
+            <a href="{% url 'products:all_products' %}?category={{ category.slug }}"
                 class="text-decoration-none text-center category-item reveal"
                 style="transition-delay: {{ forloop.counter0 }}00ms;">
                 <div class="category-img-wrapper mb-3 mx-auto shadow-sm">

@@ -210,30 +210,6 @@ class ProductDetailView(DetailView):
                 messages.error(request, "You have already reviewed this product.")
         return redirect('products:product_detail', slug=self.object.slug)
 
-class CategoryProductListView(ListView):
-    model = Product
-    template_name = 'products/category_products.html'
-    context_object_name = 'products'
-
-    def get_queryset(self):
-        self.category = get_object_or_404(Category, slug=self.kwargs['slug'])
-        queryset = Product.objects.filter(category=self.category, is_active=True)
-        
-        subcategory_slug = self.request.GET.get('subcategory')
-        if subcategory_slug:
-            self.subcategory = get_object_or_404(SubCategory, slug=subcategory_slug, category=self.category)
-            queryset = queryset.filter(subcategory=self.subcategory)
-        else:
-            self.subcategory = None
-            
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['category'] = self.category
-        context['selected_subcategory'] = self.subcategory
-        return context
-
 
 class ShopListView(ListView):
     model = Product
@@ -242,7 +218,7 @@ class ShopListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True).order_by('-created_at')
+        queryset = Product.objects.filter(is_active=True)
         
         # Search functionality
         query = self.request.GET.get('q')
@@ -253,21 +229,46 @@ class ShopListView(ListView):
                 db_models.Q(scientific_name__icontains=query)
             )
 
+        # Category filter
         category_slug = self.request.GET.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
+        
+        # Subcategory filter
+        subcategory_slug = self.request.GET.get('subcategory')
+        if subcategory_slug:
+            queryset = queryset.filter(subcategory__slug=subcategory_slug)
+
+        # Price range filter
+        min_price = self.request.GET.get('min_price')
+        max_price = self.request.GET.get('max_price')
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
             
+        # Sorting
         sort = self.request.GET.get('sort')
         if sort == 'price_low':
             queryset = queryset.order_by('price')
         elif sort == 'price_high':
             queryset = queryset.order_by('-price')
+        elif sort == 'name':
+            queryset = queryset.order_by('name')
+        else:
+            # Default to newest
+            queryset = queryset.order_by('-created_at')
             
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.all().prefetch_related('subcategories')
+        # Preserve query parameters for pagination
+        query_params = self.request.GET.copy()
+        if 'page' in query_params:
+            del query_params['page']
+        context['query_params'] = query_params.urlencode()
         return context
 
 
@@ -284,9 +285,6 @@ class ContactUsView(CreateView):
         messages.success(self.request, "Thank you for contacting us! We will get back to you soon.")
         return super().form_valid(form)
 
-
-class BecomeVendorView(TemplateView):
-    template_name = 'products/become_vendor.html'
 
 def update_order_item_status(request, item_id):
     from django.contrib.auth.decorators import login_required
@@ -306,6 +304,27 @@ def update_order_item_status(request, item_id):
         if new_status in dict(OrderItem.STATUS_CHOICES):
             item.status = new_status
             item.save()
+            
+            # Update parent Order status
+            order = item.order
+            all_items = order.items.all()
+            statuses = [i.status for i in all_items]
+            
+            if all(s == 'DELIVERED' for s in statuses):
+                order.status = 'DELIVERED'
+            elif any(s == 'CANCELLED' for s in statuses) and all(s in ['DELIVERED', 'CANCELLED'] for s in statuses):
+                # If some are delivered and some cancelled, we might still want to call it delivered or something else
+                # For now, let's say if it's not pending/processing/shipped, it's settled
+                order.status = 'DELIVERED' # Or add a 'COMPLETED' status
+            elif any(s == 'SHIPPED' for s in statuses):
+                order.status = 'SHIPPED'
+            elif any(s == 'PROCESSING' for s in statuses):
+                order.status = 'PROCESSING'
+            else:
+                order.status = 'PENDING'
+            
+            order.save()
+            
             messages.success(request, f"Status for {item.product.name} updated to {item.get_status_display()}.")
         else:
             messages.error(request, "Invalid status selected.")
